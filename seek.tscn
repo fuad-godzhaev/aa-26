@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://duwvmsb0yjsdb"]
+
+[ext_resource type="Script" uid="uid://cef1kwaivjcta" path="res://boid.gd" id="1_g7hsx"]
+[ext_resource type="Script" uid="uid://cbafjbwp2jn6" path="res://target.gd" id="2_q6o6m"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7qd4g"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_g7hsx"]
+sky_material = SubResource("ProceduralSkyMaterial_7qd4g")
+
+[sub_resource type="Environment" id="Environment_q6o6m"]
+background_mode = 1
+sky = SubResource("Sky_g7hsx")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_7qd4g"]
+size = Vector3(0.1, 0.1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q6o6m"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q6o6m"]
+size = Vector3(0.1, 0.1, 0.5)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_q6o6m"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_q6o6m"]
+size = Vector2(100, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tgpyc"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7qd4g"]
+radius = 0.05
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7qd4g"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_q6o6m"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -26.957905, 0, -12.22068, 0, 0, 0, 0, 0, 0, 16.103756, 0, -29.387154, 0, 0, 0, 0, 0, 0, 29.48779, 0, 21.384874, 0, 0, 0, 0, 0, 0, -16.91988, 0, 29.240717, 0, 0, 0, 0, 0, 0, 10.430832, 11.649977, 18.22773, 0, 0, 0, 0, 0, 0, 26.685427, 8.640753, 12.46949),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[node name="seek_scene" type="Node3D" unique_id=1579189192]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1711712720]
+environment = SubResource("Environment_q6o6m")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1043279064]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1538319775]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 3.2644324, -0.32025528)
+
+[node name="pos_label" type="Label" parent="." unique_id=614635267]
+offset_left = 104.0
+offset_top = 116.0
+offset_right = 171.0
+offset_bottom = 139.0
+text = "Position:"
+
+[node name="boid" type="CharacterBody3D" parent="." unique_id=783108805 node_paths=PackedStringArray("target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+script = ExtResource("1_g7hsx")
+target = NodePath("../target")
+speed = 1.0
+max_speed = 1.0
+
+[node name="box" type="MeshInstance3D" parent="boid" unique_id=1847198114]
+mesh = SubResource("BoxMesh_7qd4g")
+surface_material_override/0 = SubResource("StandardMaterial3D_q6o6m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="boid" unique_id=1163347231]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0013427734, 0.0013427734)
+shape = SubResource("BoxShape3D_q6o6m")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=88262424]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1214780170]
+shape = SubResource("WorldBoundaryShape3D_q6o6m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1369783904]
+mesh = SubResource("PlaneMesh_q6o6m")
+surface_material_override/0 = SubResource("StandardMaterial3D_tgpyc")
+
+[node name="target" type="Marker3D" parent="." unique_id=925313394]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.200531, 0.05, -1.2188778)
+script = ExtResource("2_q6o6m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="target" unique_id=942391190]
+mesh = SubResource("SphereMesh_7qd4g")
+surface_material_override/0 = SubResource("StandardMaterial3D_7qd4g")
+
+[node name="Timer" type="Timer" parent="target" unique_id=1148819436]
+wait_time = 3.0
+autostart = true
+
+[node name="Path3D" type="Path3D" parent="." unique_id=270280214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.708883, 0)
+curve = SubResource("Curve3D_q6o6m")
+
+[connection signal="timeout" from="target/Timer" to="target" method="_on_timer_timeout"]
