@@ -59,7 +59,7 @@ transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1538319775]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 3.2644324, -0.32025528)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 6.0981007, 8.470398, -0.32025528)
 
 [node name="pos_label" type="Label" parent="." unique_id=614635267]
 offset_left = 104.0
@@ -74,6 +74,7 @@ script = ExtResource("1_g7hsx")
 target = NodePath("../target")
 speed = 1.0
 max_speed = 1.0
+slowing_distance = 4.0
 
 [node name="box" type="MeshInstance3D" parent="boid" unique_id=1847198114]
 mesh = SubResource("BoxMesh_7qd4g")
@@ -93,7 +94,7 @@ mesh = SubResource("PlaneMesh_q6o6m")
 surface_material_override/0 = SubResource("StandardMaterial3D_tgpyc")
 
 [node name="target" type="Marker3D" parent="." unique_id=925313394]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.200531, 0.05, -1.2188778)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.05, -5)
 script = ExtResource("2_q6o6m")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="target" unique_id=942391190]
@@ -101,7 +102,7 @@ mesh = SubResource("SphereMesh_7qd4g")
 surface_material_override/0 = SubResource("StandardMaterial3D_7qd4g")
 
 [node name="Timer" type="Timer" parent="target" unique_id=1148819436]
-wait_time = 3.0
+wait_time = 10.0
 autostart = true
 
 [node name="Path3D" type="Path3D" parent="." unique_id=270280214]
