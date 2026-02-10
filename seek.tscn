@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cef1kwaivjcta" path="res://boid.gd" id="1_g7hsx"]
 [ext_resource type="Script" uid="uid://cbafjbwp2jn6" path="res://target.gd" id="2_q6o6m"]
+[ext_resource type="Script" uid="uid://c4ceu1f2nid34" path="res://path_follow_3d.gd" id="3_tgpyc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7qd4g"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -44,10 +45,12 @@ albedo_color = Color(1, 0, 0, 1)
 
 [sub_resource type="Curve3D" id="Curve3D_q6o6m"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -26.957905, 0, -12.22068, 0, 0, 0, 0, 0, 0, 16.103756, 0, -29.387154, 0, 0, 0, 0, 0, 0, 29.48779, 0, 21.384874, 0, 0, 0, 0, 0, 0, -16.91988, 0, 29.240717, 0, 0, 0, 0, 0, 0, 10.430832, 11.649977, 18.22773, 0, 0, 0, 0, 0, 0, 26.685427, 8.640753, 12.46949),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -26.957905, 0, -12.22068, 0, 0, 0, 0, 0, 0, -27.990875, 0, -10.895398, 0, 0, 0, 0, 0, 0, 29.48779, 0, 21.384874, 0, 0, 0, 0, 0, 0, -16.91988, 0, 29.240717, 0, 0, 0, 0, 0, 0, 10.430832, 11.649977, 18.22773, 0, 0, 0, 0, 0, 0, 26.685427, 8.640753, 12.46949, 0, 0, 0, 0, 0, 0, -5.959361, 8.640726, -1.8769655, 0, 0, 0, 0, 0, 0, -1.1144476, 8.640726, -15.731979, 0, 0, 0, 0, 0, 0, 6.0766716, 8.640726, -8.270193, 0, 0, 0, 0, 0, 0, 10.264216, 8.640726, -2.5782075),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 6
+point_count = 10
+
+[sub_resource type="BoxMesh" id="BoxMesh_q6o6m"]
 
 [node name="seek_scene" type="Node3D" unique_id=1579189192]
 
@@ -57,9 +60,6 @@ environment = SubResource("Environment_q6o6m")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1043279064]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1538319775]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 6.0981007, 8.470398, -0.32025528)
 
 [node name="pos_label" type="Label" parent="." unique_id=614635267]
 offset_left = 104.0
@@ -75,6 +75,7 @@ target = NodePath("../target")
 speed = 1.0
 max_speed = 1.0
 slowing_distance = 4.0
+banking = 5.0
 
 [node name="box" type="MeshInstance3D" parent="boid" unique_id=1847198114]
 mesh = SubResource("BoxMesh_7qd4g")
@@ -84,17 +85,21 @@ surface_material_override/0 = SubResource("StandardMaterial3D_q6o6m")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0013427734, 0.0013427734)
 shape = SubResource("BoxShape3D_q6o6m")
 
+[node name="cam_target" type="Marker3D" parent="boid" unique_id=1109310616]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0246034, -1.7231966)
+
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=88262424]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1214780170]
 shape = SubResource("WorldBoundaryShape3D_q6o6m")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1369783904]
+visible = false
 mesh = SubResource("PlaneMesh_q6o6m")
 surface_material_override/0 = SubResource("StandardMaterial3D_tgpyc")
 
 [node name="target" type="Marker3D" parent="." unique_id=925313394]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.05, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3208313, 0.05, -5.0853233)
 script = ExtResource("2_q6o6m")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="target" unique_id=942391190]
@@ -106,7 +111,17 @@ wait_time = 10.0
 autostart = true
 
 [node name="Path3D" type="Path3D" parent="." unique_id=270280214]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.708883, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.2354813, 0)
 curve = SubResource("Curve3D_q6o6m")
+
+[node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=839837693]
+transform = Transform3D(-0.7887163, 0, 0.61475253, 0, 1, 0, -0.61475253, 0, -0.7887163, -26.957905, 0, -12.22068)
+script = ExtResource("3_tgpyc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Path3D/PathFollow3D" unique_id=1614593539]
+mesh = SubResource("BoxMesh_q6o6m")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=325245612]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -27.181686, 31.30457, -12.966545)
 
 [connection signal="timeout" from="target/Timer" to="target" method="_on_timer_timeout"]

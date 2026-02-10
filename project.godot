@@ -19,11 +19,6 @@ config/icon="res://icon.svg"
 
 settings/addon_root_folder="res://addons/debug_draw_3d"
 
-[editor]
-
-version_control/plugin_name="GitPlugin"
-version_control/autoload_on_startup=true
-
 [physics]
 
 3d/physics_engine="Jolt Physics"
