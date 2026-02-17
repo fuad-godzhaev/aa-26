@@ -2,6 +2,12 @@
 
 [ext_resource type="Script" uid="uid://cef1kwaivjcta" path="res://boid.gd" id="1_g7hsx"]
 [ext_resource type="Script" uid="uid://cbafjbwp2jn6" path="res://target.gd" id="2_q6o6m"]
+<<<<<<< Updated upstream
+=======
+[ext_resource type="Script" uid="uid://dermslbu26jt3" path="res://path_drawer.gd" id="3_p2fuv"]
+[ext_resource type="Script" path="res://path_follow_3d.gd" id="3_tgpyc"]
+[ext_resource type="Script" uid="uid://cxxx5a7dij3o" path="res://tpc.gd" id="5_dik45"]
+>>>>>>> Stashed changes
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7qd4g"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -108,5 +114,20 @@ autostart = true
 [node name="Path3D" type="Path3D" parent="." unique_id=270280214]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.708883, 0)
 curve = SubResource("Curve3D_q6o6m")
+script = ExtResource("3_p2fuv")
 
+<<<<<<< Updated upstream
+=======
+[node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=839837693]
+transform = Transform3D(-0.7887163, 0, 0.61475253, 0, 1, 0, -0.61475253, 0, -0.7887163, -26.957905, 0, -12.22068)
+script = ExtResource("3_tgpyc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Path3D/PathFollow3D" unique_id=1614593539]
+mesh = SubResource("BoxMesh_q6o6m")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=325245612]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -27.181686, 31.30457, -12.966545)
+script = ExtResource("5_dik45")
+
+>>>>>>> Stashed changes
 [connection signal="timeout" from="target/Timer" to="target" method="_on_timer_timeout"]

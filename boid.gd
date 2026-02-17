@@ -31,24 +31,92 @@ func arrive():
 	
 	return desired - velocity
 
+<<<<<<< Updated upstream
 func seek():
 	var to_target = target.global_position - global_position
+=======
+
+func seek(target:Vector3):
+	var to_target = target - global_position
+>>>>>>> Stashed changes
 	var desired:Vector3 = to_target.normalized() * max_speed
 	DebugDraw3D.draw_arrow(global_position, global_position + desired, Color.DARK_ORANGE, 0.1) # To Target Vector (Desired)
 
 	return desired - velocity
+<<<<<<< Updated upstream
 	
 func _physics_process(delta: float) -> void:
 	var force = arrive()
 	accel = arrive() / mass
+=======
+
+func player_steering():
+	var direction = Vector3.ZERO
+	var velocity = Input.get_vector("Left", "Right", "Up", "Down")
+	
+	if Input.is_action_pressed("Right"):
+		direction.x += 1
+	if Input.is_action_pressed("Left"):
+		direction.x -= 1
+	if Input.is_action_pressed("Down"):
+		direction.z += 1
+	if Input.is_action_pressed("Up"):
+		direction.z -= 1
+		
+	force.x = direction.x * speed
+	force.z = direction.z * speed
+	var strength = Input.get_action_strength("accelerate")
+	
+	DebugDraw3D.draw_arrow(global_position, global_position + velocity + direction, Color.YELLOW)
+	
+	return strength
+
+var current_waypoint = 0
+
+func follow_path():
+	var target = path.global_transform * path.curve.get_point_position(current_waypoint)
+	var dist = target.distance_to(global_position)
+	
+	if dist < 0.5:
+		current_waypoint = (current_waypoint + 1) % path.curve.point_count
+	return seek(target)
+
+func calculate_force():
+	var f:Vector3
+	if seek_enabled:
+		f += seek(target.global_position)
+	if arrive_enabled:
+		f += arrive()
+	if path_follow_enabled:
+		f += follow_path()
+	if player_steering_enabled:
+		f += player_steering()
+	return f
+		
+	
+	
+func _physics_process(delta: float) -> void:
+	var force = calculate_force()
+	
+	DebugDraw3D.draw_arrow(global_position, global_position + force * 10, Color.RED, 0.1)
+	accel = force / mass
+>>>>>>> Stashed changes
 	velocity = velocity + accel * delta
 	speed = velocity.length()
+	
 	if speed > 0:
 		look_at(global_position - velocity)
 	global_position += velocity * delta
 	
+<<<<<<< Updated upstream
 	#DebugDraw3D.draw_arrow(global_position, global_position + global_basis.z, Color.BURLYWOOD, 0.1)
 	DebugDraw3D.draw_arrow(global_position, global_position + velocity, Color.CORNFLOWER_BLUE, 0.1) # Current Velocity
 	DebugDraw3D.draw_arrow(global_position, global_position + force * 10, Color.RED, 0.1) # Current Velocity
 
+=======
+	# DebugDraw3D.draw_arrow(global_position, global_position + global_basis.z, Color.BURLYWOOD, 0.1)
+	DebugDraw3D.draw_arrow(global_position, global_position + velocity, Color.CORNFLOWER_BLUE, 0.1)
+	DebugDraw3D.draw_arrow(global_position, global_position + global_basis.y * 5, Color.RED)
+	DebugDraw3D.draw_arrow(global_position, global_position + force, Color.YELLOW)
+>>>>>>> Stashed changes
 	
