@@ -26,6 +26,7 @@ version_control/autoload_on_startup=true
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 [input]
 
@@ -50,6 +51,8 @@ Down={
 ]
 }
 
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
