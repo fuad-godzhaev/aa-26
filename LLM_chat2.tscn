@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://cvr87kuqx8otf"]
+
+[ext_resource type="Script" uid="uid://bmfiqt17wk382" path="res://nobody_who_chat.gd" id="1_cflly"]
+[ext_resource type="Script" uid="uid://d4drkbb6x3mlw" path="res://llm_chat_2.gd" id="1_uct4s"]
+
+[node name="LlmChat2" type="Control" unique_id=2079170007]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uct4s")
+
+[node name="NobodyWhoModel" type="NobodyWhoModel" parent="." unique_id=1447496108]
+model_path = "res://addons/Qwen2.5-Omni-7B-UD-Q4_K_XL.gguf"
+
+[node name="NobodyWhoChat" type="NobodyWhoChat" parent="." unique_id=973617405 node_paths=PackedStringArray("model_node")]
+model_node = NodePath("../NobodyWhoModel")
+script = ExtResource("1_cflly")
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=325859982]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 0
+offset_left = 2.0
+offset_right = 10.0
+offset_bottom = 8.0
+backspace_deletes_composite_character_enabled = true
+
+[node name="TextEdit2" type="TextEdit" parent="." unique_id=869579465]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 0
+offset_top = 350.0
+offset_right = 8.0
+offset_bottom = 358.0
+backspace_deletes_composite_character_enabled = true
+
+[node name="Button" type="Button" parent="." unique_id=1191277866]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 315.0
+offset_right = 397.0
+offset_bottom = 346.0
+text = "Send"
+
+[connection signal="response_finished" from="NobodyWhoChat" to="." method="_on_nobody_who_chat_response_finished"]
+[connection signal="response_updated" from="NobodyWhoChat" to="." method="_on_nobody_who_chat_response_updated"]
