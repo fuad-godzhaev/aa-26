@@ -69,3 +69,4 @@ themetaverse/addons/godot-xr-tools/player/Commix - Be True.mp3
 themetaverse/addons/godot-xr-tools/player/Commix - Be True.mp3.import
 themetaverse/assets/be_true.mp3
 themetaverse/assets/be_true.mp3.import
+*.gguf
