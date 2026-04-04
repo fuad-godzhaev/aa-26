@@ -8,6 +8,11 @@ export.cfg
 export_presets.cfg
 addons/nobodywho/
 
+# Local-only working docs (kept on disk, not tracked)
+CLAUDE.md
+assignment/ARCHITECTURE.md
+assignment/CLAUDE_NOTES.md
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 

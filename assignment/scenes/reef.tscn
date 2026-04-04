@@ -1,0 +1,246 @@
+[gd_scene format=3 uid="uid://c6m5rc3lcpmth"]
+
+[ext_resource type="Script" path="res://assignment/scripts/player_fly.gd" id="1"]
+[ext_resource type="Script" path="res://assignment/scripts/player_probe.gd" id="2"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini.gd" id="3"]
+[ext_resource type="Shader" path="res://assignment/materials/glow.gdshader" id="4"]
+[ext_resource type="Shader" path="res://assignment/materials/kelp.gdshader" id="5"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.01, 0.045, 0.06, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.09, 0.22, 0.27, 1)
+ambient_light_energy = 0.7
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 1.2
+glow_bloom = 0.15
+fog_enabled = true
+fog_light_color = Color(0.02, 0.1, 0.13, 1)
+fog_density = 0.05
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_color = Color(0.03, 0.07, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="rock_mat"]
+albedo_color = Color(0.05, 0.09, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="SphereMesh" id="coral_mesh"]
+radius = 0.6
+height = 1.2
+
+[sub_resource type="ShaderMaterial" id="glow_coral"]
+render_priority = 0
+shader = ExtResource("4")
+shader_parameter/base_color = Color(0.08, 0.05, 0.03, 1)
+shader_parameter/glow_color = Color(0.95, 0.55, 0.2, 1)
+shader_parameter/pulse_speed = 0.6
+shader_parameter/pulse_strength = 0.4
+shader_parameter/rim_strength = 1.0
+shader_parameter/emission_energy = 1.8
+
+[sub_resource type="CylinderMesh" id="kelp_mesh"]
+top_radius = 0.04
+bottom_radius = 0.08
+height = 4.0
+radial_segments = 8
+
+[sub_resource type="ShaderMaterial" id="kelp_mat"]
+render_priority = 0
+shader = ExtResource("5")
+shader_parameter/kelp_color = Color(0.04, 0.22, 0.12, 1)
+shader_parameter/sway_speed = 1.0
+shader_parameter/sway_amount = 0.28
+
+[sub_resource type="ParticleProcessMaterial" id="snow_proc"]
+emission_shape = 3
+emission_box_extents = Vector3(22, 8, 22)
+direction = Vector3(0, -1, 0)
+spread = 8.0
+initial_velocity_min = 0.1
+initial_velocity_max = 0.4
+gravity = Vector3(0, -0.15, 0)
+scale_min = 0.4
+
+[sub_resource type="StandardMaterial3D" id="snow_mat"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.7, 0.85, 0.9, 0.5)
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="snow_mesh"]
+material = SubResource("snow_mat")
+size = Vector2(0.035, 0.035)
+
+[sub_resource type="ShaderMaterial" id="glow_body"]
+render_priority = 0
+shader = ExtResource("4")
+shader_parameter/base_color = Color(0.04, 0.16, 0.2, 1)
+shader_parameter/glow_color = Color(0.1, 0.85, 0.8, 1)
+shader_parameter/pulse_speed = 1.5
+shader_parameter/pulse_strength = 0.55
+shader_parameter/rim_strength = 1.6
+shader_parameter/emission_energy = 2.2
+
+[sub_resource type="SphereShape3D" id="gem_shape"]
+radius = 0.6
+
+[sub_resource type="SphereMesh" id="hull_mesh"]
+
+[sub_resource type="SphereMesh" id="eye_mesh"]
+radius = 0.08
+height = 0.16
+
+[sub_resource type="StandardMaterial3D" id="eye_mat"]
+shading_mode = 0
+albedo_color = Color(0.7, 0.95, 1, 1)
+
+[sub_resource type="BoxMesh" id="fin_mesh"]
+size = Vector3(0.6, 0.04, 0.4)
+
+[sub_resource type="BoxMesh" id="tail_mesh"]
+size = Vector3(0.12, 0.12, 0.5)
+
+[node name="reef" type="Node3D" unique_id=1623239213]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1653996051]
+environment = SubResource("Env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=185552698]
+transform = Transform3D(0.7, -0.6, 0.4, 0, 0.55, 0.83, -0.71, -0.58, 0.39, 0, 12, 0)
+light_color = Color(0.55, 0.8, 0.85, 1)
+light_energy = 0.6
+shadow_enabled = true
+
+[node name="Seafloor" type="CSGBox3D" parent="." unique_id=1692862589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+size = Vector3(60, 1, 60)
+material = SubResource("floor_mat")
+
+[node name="Rock1" type="CSGSphere3D" parent="." unique_id=1270249979]
+transform = Transform3D(2.2, 0, 0, 0, 1.4, 0, 0, 0, 2.2, -8, 0, -6)
+radius = 1.5
+material = SubResource("rock_mat")
+
+[node name="Rock2" type="CSGSphere3D" parent="." unique_id=1102409192]
+transform = Transform3D(1.6, 0, 0, 0, 1.1, 0, 0, 0, 1.6, 9, 0, 4)
+radius = 1.5
+material = SubResource("rock_mat")
+
+[node name="Coral1" type="MeshInstance3D" parent="." unique_id=524779337]
+transform = Transform3D(1, 0, 0, 0, 1.3, 0, 0, 0, 1, -3, 0.2, -7)
+mesh = SubResource("coral_mesh")
+surface_material_override/0 = SubResource("glow_coral")
+
+[node name="Coral2" type="MeshInstance3D" parent="." unique_id=2048870765]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 0.8, 7, 0.1, -2)
+mesh = SubResource("coral_mesh")
+surface_material_override/0 = SubResource("glow_coral")
+
+[node name="Coral3" type="MeshInstance3D" parent="." unique_id=47437479]
+transform = Transform3D(1.1, 0, 0, 0, 1.4, 0, 0, 0, 1.1, 2, 0.2, 8)
+mesh = SubResource("coral_mesh")
+surface_material_override/0 = SubResource("glow_coral")
+
+[node name="Kelp1" type="MeshInstance3D" parent="." unique_id=1071016706]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, 2)
+mesh = SubResource("kelp_mesh")
+surface_material_override/0 = SubResource("kelp_mat")
+
+[node name="Kelp2" type="MeshInstance3D" parent="." unique_id=921653411]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -5, 2.4, 3)
+mesh = SubResource("kelp_mesh")
+surface_material_override/0 = SubResource("kelp_mat")
+
+[node name="Kelp3" type="MeshInstance3D" parent="." unique_id=1257392680]
+transform = Transform3D(1, 0, 0, 0, 0.9, 0, 0, 0, 1, 5, 1.8, -8)
+mesh = SubResource("kelp_mesh")
+surface_material_override/0 = SubResource("kelp_mat")
+
+[node name="Kelp4" type="MeshInstance3D" parent="." unique_id=1410855354]
+transform = Transform3D(1, 0, 0, 0, 1.1, 0, 0, 0, 1, 6, 2.2, -7)
+mesh = SubResource("kelp_mesh")
+surface_material_override/0 = SubResource("kelp_mat")
+
+[node name="MarineSnow" type="GPUParticles3D" parent="." unique_id=1992921152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+amount = 250
+lifetime = 14.0
+process_material = SubResource("snow_proc")
+draw_pass_1 = SubResource("snow_mesh")
+
+[node name="Home" type="Marker3D" parent="." unique_id=1916966173]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="Gemini" type="CharacterBody3D" parent="." unique_id=2055016811 node_paths=PackedStringArray("player", "home")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2, -4)
+script = ExtResource("3")
+player = NodePath("../PlayerRig/Probe")
+home = NodePath("../Home")
+glow_material = SubResource("glow_body")
+
+[node name="Collision" type="CollisionShape3D" parent="Gemini" unique_id=771129657]
+shape = SubResource("gem_shape")
+
+[node name="Body" type="Node3D" parent="Gemini" unique_id=1291820714]
+
+[node name="Hull" type="MeshInstance3D" parent="Gemini/Body" unique_id=1440658809]
+transform = Transform3D(1.1, 0, 0, 0, 0.55, 0, 0, 0, 1.5, 0, 0, 0)
+mesh = SubResource("hull_mesh")
+surface_material_override/0 = SubResource("glow_body")
+
+[node name="EyeUL" type="MeshInstance3D" parent="Gemini/Body" unique_id=246130450]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.12, -0.62)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="EyeUR" type="MeshInstance3D" parent="Gemini/Body" unique_id=1756788645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.12, -0.62)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="EyeLL" type="MeshInstance3D" parent="Gemini/Body" unique_id=1335302688]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, -0.05, -0.55)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="EyeLR" type="MeshInstance3D" parent="Gemini/Body" unique_id=1953241820]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.05, -0.55)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="FinL" type="MeshInstance3D" parent="Gemini/Body" unique_id=1124581096]
+transform = Transform3D(0.94, 0, -0.34, 0, 1, 0, 0.34, 0, 0.94, -0.6, 0, 0.1)
+mesh = SubResource("fin_mesh")
+surface_material_override/0 = SubResource("glow_body")
+
+[node name="FinR" type="MeshInstance3D" parent="Gemini/Body" unique_id=1270375218]
+transform = Transform3D(0.94, 0, 0.34, 0, 1, 0, -0.34, 0, 0.94, 0.6, 0, 0.1)
+mesh = SubResource("fin_mesh")
+surface_material_override/0 = SubResource("glow_body")
+
+[node name="Tail" type="MeshInstance3D" parent="Gemini/Body" unique_id=1148705560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.75)
+mesh = SubResource("tail_mesh")
+surface_material_override/0 = SubResource("glow_body")
+
+[node name="CamTarget" type="Marker3D" parent="Gemini" unique_id=598837716]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 2.2)
+
+[node name="PlayerRig" type="Node3D" parent="." unique_id=1536124949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, 9)
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="PlayerRig" unique_id=1624855939]
+current = true
+fov = 90.0
+
+[node name="Probe" type="Node3D" parent="PlayerRig" unique_id=1299928040 node_paths=PackedStringArray("source")]
+visible = false
+script = ExtResource("2")
+source = NodePath("..")
+draw_gizmos = false
