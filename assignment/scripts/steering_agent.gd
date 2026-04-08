@@ -10,6 +10,9 @@ extends CharacterBody3D
 @export var max_force: float = 20.0
 @export var slowing_distance: float = 4.0
 @export var banking: float = 5.0
+# Water drag: fraction of speed bled off per second. Damps the
+# force-vs-velocity oscillation and gives an underwater glide.
+@export var drag: float = 0.8
 @export var draw_gizmos: bool = true
 
 # Hard containment so manual integration cannot leave the reef volume.
@@ -35,13 +38,17 @@ func _physics_process(delta: float) -> void:
 	var force := _compute_steering(delta).limit_length(max_force)
 	var accel := force / mass
 	velocity += accel * delta
+	velocity = velocity.lerp(Vector3.ZERO, clampf(drag * delta, 0.0, 1.0))
 	if velocity.length() > max_speed:
 		velocity = velocity.normalized() * max_speed
 	speed = velocity.length()
-	if speed > 0.001:
-		# Face travel: -Z (the body's front / eyes) points along velocity.
-		var temp_up := global_basis.y.lerp(Vector3.UP + accel * banking, delta * 5.0)
-		look_at(global_position + velocity, temp_up)
+	# Only re-orient with enough speed, and skip when travelling almost
+	# straight up/down (look_at degenerates when dir ~ up -> spin/jitter).
+	if speed > 0.05:
+		var dir := velocity / speed
+		if absf(dir.dot(Vector3.UP)) < 0.95:
+			var temp_up := global_basis.y.lerp(Vector3.UP + accel * banking, delta * 5.0)
+			look_at(global_position + velocity, temp_up)
 	global_position += velocity * delta
 	_contain()
 
@@ -53,12 +60,16 @@ func _physics_process(delta: float) -> void:
 # Clamp into the reef volume and shed the velocity component that would
 # push past the boundary, so it skims edges instead of sticking/jittering.
 func _contain() -> void:
+	# Gentle restitution (not a hard zero) so it eases off the boundary
+	# instead of stick-slip jittering against it.
 	if global_position.y < min_altitude:
 		global_position.y = min_altitude
-		velocity.y = maxf(velocity.y, 0.0)
+		if velocity.y < 0.0:
+			velocity.y *= -0.15
 	elif global_position.y > max_altitude:
 		global_position.y = max_altitude
-		velocity.y = minf(velocity.y, 0.0)
+		if velocity.y > 0.0:
+			velocity.y *= -0.15
 
 	var flat := Vector3(global_position.x, 0.0, global_position.z)
 	var r := flat.length()

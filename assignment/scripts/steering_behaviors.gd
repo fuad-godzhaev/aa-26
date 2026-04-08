@@ -7,6 +7,7 @@ extends RefCounted
 # Per-agent wander memory; one instance lives on each wandering agent.
 class WanderState extends RefCounted:
 	var angle: float = 0.0
+	var pitch: float = 0.0       # vertical component for 3D wander
 	var jitter: float = 3.0      # radians/sec of random walk
 	var radius: float = 1.2      # wander circle radius
 	var distance: float = 2.5    # circle projection ahead of the agent
@@ -77,3 +78,42 @@ static func wander(state: WanderState, forward: Vector3, velocity: Vector3, max_
 	var offset := Vector3(cos(state.angle), 0.0, sin(state.angle)) * state.radius
 	var desired := (centre + offset).normalized() * max_speed
 	return desired - velocity
+
+
+# 3D wander: adds a gently bounded vertical component.
+static func wander3d(state: WanderState, forward: Vector3, velocity: Vector3, max_speed: float, delta: float) -> Vector3:
+	state.angle += randf_range(-state.jitter, state.jitter) * delta
+	# Vertical drifts slowly and shallowly so it glides, not bobs.
+	state.pitch += randf_range(-state.jitter, state.jitter) * 0.2 * delta
+	state.pitch = clampf(state.pitch, -0.35, 0.35)
+	var centre := forward.normalized() * state.distance
+	var offset := Vector3(cos(state.angle), sin(state.pitch), sin(state.angle)) * state.radius
+	var desired := (centre + offset).normalized() * max_speed
+	return desired - velocity
+
+
+# Steer clear of spheres in the path. `obstacles` is an Array of Vector4
+# (xyz = world centre, w = radius). Only obstacles ahead within
+# `look_ahead` along the velocity are considered.
+static func avoid_spheres(from_pos: Vector3, velocity: Vector3, max_speed: float, obstacles: Array, look_ahead: float) -> Vector3:
+	if velocity.length() < 0.001:
+		return Vector3.ZERO
+	var dir := velocity.normalized()
+	var steer := Vector3.ZERO
+	for o in obstacles:
+		var centre := Vector3(o.x, o.y, o.z)
+		var to_o := centre - from_pos
+		var ahead := dir.dot(to_o)
+		if ahead < 0.0 or ahead > look_ahead:
+			continue
+		var nearest := from_pos + dir * ahead
+		var gap := nearest.distance_to(centre)
+		var safe: float = o.w + 1.0
+		if gap < safe:
+			var push := nearest - centre
+			if push.length() < 0.001:
+				push = dir.cross(Vector3.UP)
+			steer += push.normalized() * ((safe - gap) / safe)
+	if steer == Vector3.ZERO:
+		return Vector3.ZERO
+	return steer.normalized() * max_speed
