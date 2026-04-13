@@ -15,6 +15,7 @@ var player_pos: Vector3 = Vector3.ZERO
 var player_speed: float = 0.0
 var player_dist: float = INF
 var threat: float = 0.0
+var has_prey: bool = false
 
 # Arbitration output, set by BT actions, consumed by the agent.
 var mode: String = "wander"
@@ -49,3 +50,17 @@ func tired() -> bool:
 
 func rested() -> bool:
 	return energy > 0.9
+
+
+# Hysteresis latch: once resting, KEEP resting until well recovered.
+# Without this the BT flips rest<->wander every frame at the 0.25
+# boundary (the post-hunt flicker bug).
+var _rest_latch: bool = false
+
+func wants_rest() -> bool:
+	if _rest_latch:
+		if energy > 0.7:
+			_rest_latch = false
+	elif energy < 0.25:
+		_rest_latch = true
+	return _rest_latch

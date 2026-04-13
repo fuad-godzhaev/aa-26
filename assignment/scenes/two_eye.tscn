@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://assignment/scripts/two_eye.gd" id="1"]
+[ext_resource type="Shader" path="res://assignment/materials/glow.gdshader" id="2"]
+
+[sub_resource type="ShaderMaterial" id="gm"]
+shader = ExtResource("2")
+shader_parameter/base_color = Color(0.04, 0.16, 0.2, 1)
+shader_parameter/glow_color = Color(0.15, 0.85, 0.9, 1)
+shader_parameter/pulse_speed = 1.4
+shader_parameter/pulse_strength = 0.5
+shader_parameter/rim_strength = 1.6
+shader_parameter/emission_energy = 2.2
+
+[sub_resource type="SphereMesh" id="hull"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="SphereMesh" id="eye"]
+radius = 0.09
+height = 0.18
+
+[sub_resource type="BoxMesh" id="tail"]
+size = Vector3(0.12, 0.12, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="eye_mat"]
+shading_mode = 0
+albedo_color = Color(0.75, 0.95, 1, 1)
+emission_enabled = true
+emission = Color(0.6, 0.95, 1, 1)
+emission_energy_multiplier = 3.5
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius = 0.55
+
+[node name="TwoEye" type="CharacterBody3D"]
+script = ExtResource("1")
+glow_material = SubResource("gm")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Body" type="Node3D" parent="."]
+
+[node name="Hull" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.9, 0, 0, 0, 0.5, 0, 0, 0, 1.3, 0, 0, 0)
+mesh = SubResource("hull")
+surface_material_override/0 = SubResource("gm")
+
+[node name="EyeL" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.06, -0.55)
+mesh = SubResource("eye")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="EyeR" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.06, -0.55)
+mesh = SubResource("eye")
+surface_material_override/0 = SubResource("eye_mat")
+
+[node name="Tail" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
+mesh = SubResource("tail")
+surface_material_override/0 = SubResource("gm")

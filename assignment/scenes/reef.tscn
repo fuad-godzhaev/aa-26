@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://c6m5rc3lcpmth"]
 
-[ext_resource type="Script" path="res://assignment/scripts/player_fly.gd" id="1"]
-[ext_resource type="Script" path="res://assignment/scripts/player_probe.gd" id="2"]
-[ext_resource type="Script" path="res://assignment/scripts/gemini.gd" id="3"]
-[ext_resource type="Shader" path="res://assignment/materials/glow.gdshader" id="4"]
-[ext_resource type="Shader" path="res://assignment/materials/kelp.gdshader" id="5"]
+[ext_resource type="Script" uid="uid://c77wi2olpyxvu" path="res://assignment/scripts/player_fly.gd" id="1"]
+[ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/player_probe.gd" id="2"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini_controller.gd" id="3"]
+[ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
+[ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -181,7 +181,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2, -4)
 script = ExtResource("3")
 player = NodePath("../PlayerRig/Probe")
 home = NodePath("../Home")
-glow_material = SubResource("glow_body")
 
 [node name="Collision" type="CollisionShape3D" parent="Gemini" unique_id=771129657]
 shape = SubResource("gem_shape")
