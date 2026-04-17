@@ -7,10 +7,12 @@ WAV/OGG) with no code change. Loop is forced in code.
 
 | File | BT mode | What it should convey |
 |------|---------|-----------------------|
-| `PLACEHOLDER_breathing.wav` | `wander` | calm idle "breathing"/soft bioluminescent hum |
-| `PLACEHOLDER_curious.wav`   | `investigate` | inquisitive chirps/clicks toward the player |
-| `PLACEHOLDER_wary.wav`      | `flee` | low alarmed hum / fast pulse |
-| `PLACEHOLDER_rest.wav`      | `rest` | very slow, sleepy low drone |
+| `PLACEHOLDER_breathing.wav` | creature `wander` | calm idle "breathing"/soft bioluminescent hum |
+| `PLACEHOLDER_curious.wav`   | creature `investigate` | inquisitive chirps/clicks toward the player |
+| `PLACEHOLDER_wary.wav`      | creature `flee` | low alarmed hum / fast pulse |
+| `PLACEHOLDER_rest.wav`      | creature `rest` | very slow, sleepy low drone |
+| `PLACEHOLDER_breath_in.wav` (M4) | diver inhale beat | regulator inhale; volume scales with exertion |
+| `PLACEHOLDER_breath_out.wav` (M4) | diver exhale beat | regulator exhale (bubbles emit on this beat) |
 
 When replacing, prefer CC0 / CC-BY sources (e.g. freesound.org) and record
 the source + licence here and in the project README — the marking scheme
@@ -22,3 +24,5 @@ explicitly rewards referenced sources.
 | curious | _TBD_ | _TBD_ |
 | wary | _TBD_ | _TBD_ |
 | rest | _TBD_ | _TBD_ |
+| breath_in | _TBD_ | _TBD_ |
+| breath_out | _TBD_ | _TBD_ |

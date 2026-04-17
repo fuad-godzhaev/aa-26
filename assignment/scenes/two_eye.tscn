@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://assignment/scripts/two_eye.gd" id="1"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye.gd" id="1"]
 [ext_resource type="Shader" path="res://assignment/materials/glow.gdshader" id="2"]
 
 [sub_resource type="ShaderMaterial" id="gm"]

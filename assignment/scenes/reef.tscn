@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://c6m5rc3lcpmth"]
 
-[ext_resource type="Script" uid="uid://c77wi2olpyxvu" path="res://assignment/scripts/player_fly.gd" id="1"]
-[ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/player_probe.gd" id="2"]
-[ext_resource type="Script" path="res://assignment/scripts/gemini_controller.gd" id="3"]
+[ext_resource type="Script" uid="uid://c77wi2olpyxvu" path="res://assignment/scripts/diver/player_fly.gd" id="1"]
+[ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/diver/player_probe.gd" id="2"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini/gemini_controller.gd" id="3"]
 [ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
 
