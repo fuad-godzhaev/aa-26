@@ -1,7 +1,7 @@
 class_name PlayerFly
-extends Node3D
+extends CharacterBody3D
 
-# Embodied diver: input -> body motion + camera modulation + spawns rig children. See ARCHITECTURE.md §5d.
+# Embodied diver: input -> body motion via move_and_slide + camera modulation + spawns rig children. See ARCHITECTURE.md §5d.
 
 const DIVER_BREATHING := preload("res://assignment/scripts/diver/diver_breathing.gd")
 const DIVER_HANDS := preload("res://assignment/scripts/diver/diver_hands.gd")
@@ -41,7 +41,7 @@ enum SwimPose { IDLE, FORWARD, BACK, LEFT, RIGHT }
 
 # Local-frame intent (+x right, +y up, +z forward). Read by DiverHands.
 var input_axes: Vector3 = Vector3.ZERO
-var velocity: Vector3 = Vector3.ZERO
+# `velocity` is inherited from CharacterBody3D and read by move_and_slide.
 # Smoothed 0..1 load drives breath rate, stroke speed bias, bob amplitude.
 var exertion: float = 0.0
 var is_sprinting: bool = false
@@ -108,7 +108,9 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.lerp(desired, clampf(accel * delta, 0.0, 1.0))
 	if dir.length_squared() < 0.0001:
 		velocity = velocity.lerp(Vector3.ZERO, clampf(drag * delta, 0.0, 1.0))
-	global_position += velocity * delta
+	# move_and_slide integrates by `velocity` and resolves collisions with
+	# the floor + kelp colliders; velocity is updated to the post-slide value.
+	move_and_slide()
 
 	var load: float = clampf(velocity.length() / maxf(move_speed, 0.001), 0.0, 1.0)
 	if is_sprinting:

@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://assignment/scripts/gemini/gemini_controller.gd" id="3"]
 [ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
+[ext_resource type="Script" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -57,7 +58,7 @@ shader_parameter/sway_amount = 0.28
 
 [sub_resource type="ParticleProcessMaterial" id="snow_proc"]
 emission_shape = 3
-emission_box_extents = Vector3(22, 8, 22)
+emission_box_extents = Vector3(28, 8, 28)
 direction = Vector3(0, -1, 0)
 spread = 8.0
 initial_velocity_min = 0.1
@@ -89,6 +90,10 @@ shader_parameter/emission_energy = 2.2
 [sub_resource type="SphereShape3D" id="gem_shape"]
 radius = 0.6
 
+[sub_resource type="CapsuleShape3D" id="diver_shape"]
+radius = 0.45
+height = 1.7
+
 [sub_resource type="SphereMesh" id="hull_mesh"]
 
 [sub_resource type="SphereMesh" id="eye_mesh"]
@@ -116,10 +121,16 @@ light_color = Color(0.55, 0.8, 0.85, 1)
 light_energy = 0.6
 shadow_enabled = true
 
-[node name="Seafloor" type="CSGBox3D" parent="." unique_id=1692862589]
+[node name="Seafloor" type="CSGCylinder3D" parent="." unique_id=1692862589]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-size = Vector3(60, 1, 60)
+radius = 30.0
+height = 1.0
+sides = 64
+use_collision = true
 material = SubResource("floor_mat")
+
+[node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
+script = ExtResource("6")
 
 [node name="Rock1" type="CSGSphere3D" parent="." unique_id=1270249979]
 transform = Transform3D(2.2, 0, 0, 0, 1.4, 0, 0, 0, 2.2, -8, 0, -6)
@@ -230,9 +241,12 @@ surface_material_override/0 = SubResource("glow_body")
 [node name="CamTarget" type="Marker3D" parent="Gemini" unique_id=598837716]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 2.2)
 
-[node name="PlayerRig" type="Node3D" parent="." unique_id=1536124949]
+[node name="PlayerRig" type="CharacterBody3D" parent="." unique_id=1536124949]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, 9)
 script = ExtResource("1")
+
+[node name="Collision" type="CollisionShape3D" parent="PlayerRig" unique_id=1730284571]
+shape = SubResource("diver_shape")
 
 [node name="Camera3D" type="Camera3D" parent="PlayerRig" unique_id=1624855939]
 current = true
