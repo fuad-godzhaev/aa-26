@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
 [ext_resource type="Script" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
+[ext_resource type="Script" path="res://assignment/scripts/world/fish_school.gd" id="7"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -215,6 +216,9 @@ material = SubResource("floor_mat")
 
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")
+
+[node name="FishSchool" type="Node3D" parent="." unique_id=1701060001]
+script = ExtResource("7")
 
 [node name="TreasureChest" type="StaticBody3D" parent="." unique_id=1457290631]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, -0.18, 5)

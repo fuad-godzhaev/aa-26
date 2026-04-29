@@ -71,6 +71,31 @@ static func separation(from_pos: Vector3, velocity: Vector3, max_speed: float, n
 	return desired - velocity
 
 
+# Match the average heading of nearby neighbours (Boids flocking).
+static func alignment(velocity: Vector3, max_speed: float, neighbour_velocities: Array) -> Vector3:
+	if neighbour_velocities.is_empty():
+		return Vector3.ZERO
+	var avg := Vector3.ZERO
+	for v in neighbour_velocities:
+		avg += v
+	avg /= float(neighbour_velocities.size())
+	if avg.length() < 0.001:
+		return Vector3.ZERO
+	var desired := avg.normalized() * max_speed
+	return desired - velocity
+
+
+# Seek the centroid of nearby neighbours (Boids flocking).
+static func cohesion(from_pos: Vector3, velocity: Vector3, max_speed: float, neighbour_positions: Array) -> Vector3:
+	if neighbour_positions.is_empty():
+		return Vector3.ZERO
+	var centroid := Vector3.ZERO
+	for p in neighbour_positions:
+		centroid += p
+	centroid /= float(neighbour_positions.size())
+	return seek(from_pos, centroid, velocity, max_speed)
+
+
 # Stateful: mutates `state.angle` to produce a smooth random heading.
 static func wander(state: WanderState, forward: Vector3, velocity: Vector3, max_speed: float, delta: float) -> Vector3:
 	state.angle += randf_range(-state.jitter, state.jitter) * delta
