@@ -29,6 +29,9 @@ enum SwimPose { IDLE, FORWARD, BACK, LEFT, RIGHT }
 @export var underwater_cutoff_hz: float = 1800.0
 @export var fog_density_shallow: float = 0.025
 @export var fog_density_deep: float = 0.07
+# Below this Y the depth gradient kicks in; above it the diver is in air.
+@export var surface_y: float = 18.0
+@export var fog_density_above_water: float = 0.004
 
 @export_group("Goggles")
 @export var goggles_visible: bool = true
@@ -205,6 +208,10 @@ func _apply_camera(delta: float) -> void:
 
 func _apply_depth_fog() -> void:
 	if _env == null or _env.environment == null:
+		return
+	# Above the water surface: thin air-fog (SurfaceTransition still handles the audio + splash events).
+	if global_position.y > surface_y:
+		_env.environment.fog_density = fog_density_above_water
 		return
 	var depth: float = clampf((4.0 - global_position.y) / 14.0, 0.0, 1.0)
 	_env.environment.fog_density = lerpf(fog_density_shallow, fog_density_deep, depth)

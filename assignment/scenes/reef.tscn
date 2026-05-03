@@ -7,10 +7,26 @@
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
 [ext_resource type="Script" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
 [ext_resource type="Script" path="res://assignment/scripts/world/fish_school.gd" id="7"]
+[ext_resource type="Shader" path="res://assignment/materials/water_surface.gdshader" id="8"]
+[ext_resource type="Script" path="res://assignment/scripts/world/surface_transition.gd" id="9"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.18, 0.42, 0.78, 1)
+sky_horizon_color = Color(0.55, 0.78, 0.88, 1)
+sky_curve = 0.15
+sky_energy_multiplier = 1.05
+ground_bottom_color = Color(0.06, 0.16, 0.20, 1)
+ground_horizon_color = Color(0.30, 0.50, 0.55, 1)
+ground_curve = 0.10
+sun_angle_max = 28.0
+sun_curve = 0.15
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
 
 [sub_resource type="Environment" id="Env"]
-background_mode = 1
-background_color = Color(0.18, 0.45, 0.55, 1)
+background_mode = 2
+sky = SubResource("sky")
 ambient_light_source = 2
 ambient_light_color = Color(0.42, 0.6, 0.65, 1)
 ambient_light_energy = 1.1
@@ -154,6 +170,23 @@ height = 1.7
 [sub_resource type="BoxShape3D" id="chest_shape"]
 size = Vector3(1.4, 0.84, 0.85)
 
+[sub_resource type="PlaneMesh" id="water_mesh"]
+size = Vector2(80, 80)
+subdivide_width = 32
+subdivide_depth = 32
+
+[sub_resource type="ShaderMaterial" id="water_mat"]
+render_priority = 0
+shader = ExtResource("8")
+shader_parameter/deep_color = Color(0.10, 0.32, 0.42, 0.65)
+shader_parameter/shallow_color = Color(0.55, 0.85, 0.92, 0.45)
+shader_parameter/wave_speed = 0.6
+shader_parameter/wave_freq = 0.18
+shader_parameter/wave_amp = 0.22
+shader_parameter/foam_scale = 4.0
+shader_parameter/metallic = 0.30
+shader_parameter/roughness = 0.40
+
 [sub_resource type="StandardMaterial3D" id="wood_mat"]
 albedo_color = Color(0.30, 0.16, 0.07, 1)
 roughness = 0.72
@@ -219,6 +252,14 @@ script = ExtResource("6")
 
 [node name="FishSchool" type="Node3D" parent="." unique_id=1701060001]
 script = ExtResource("7")
+
+[node name="WaterSurface" type="MeshInstance3D" parent="." unique_id=1701070001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
+mesh = SubResource("water_mesh")
+surface_material_override/0 = SubResource("water_mat")
+
+[node name="SurfaceTransition" type="Node3D" parent="." unique_id=1701070002]
+script = ExtResource("9")
 
 [node name="TreasureChest" type="StaticBody3D" parent="." unique_id=1457290631]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, -0.18, 5)

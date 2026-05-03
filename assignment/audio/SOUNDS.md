@@ -13,6 +13,8 @@ WAV/OGG) with no code change. Loop is forced in code.
 | `PLACEHOLDER_rest.wav`      | creature `rest` | very slow, sleepy low drone |
 | `PLACEHOLDER_breath_in.wav` (M4) | diver inhale beat | regulator inhale; volume scales with exertion |
 | `PLACEHOLDER_breath_out.wav` (M4) | diver exhale beat | regulator exhale (bubbles emit on this beat) |
+| `PLACEHOLDER_splash.wav` (M5) | surface-crossing event | one-shot water splash, fires both up and down |
+| `PLACEHOLDER_ambient.wav` (M5) | global ambient bed | looped underwater rumble / distant whales |
 
 When replacing, prefer CC0 / CC-BY sources (e.g. freesound.org) and record
 the source + licence here and in the project README — the marking scheme
@@ -26,3 +28,5 @@ explicitly rewards referenced sources.
 | rest | _TBD_ | _TBD_ |
 | breath_in | _TBD_ | _TBD_ |
 | breath_out | _TBD_ | _TBD_ |
+| splash | _TBD_ | _TBD_ |
+| ambient | _TBD_ | _TBD_ |
