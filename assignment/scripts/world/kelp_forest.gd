@@ -10,11 +10,13 @@ const KELP_SHADER := preload("res://assignment/materials/kelp.gdshader")
 @export var count: int = 320
 # Number of concentric rings; total stalks = count * rings spread radially.
 @export var rings: int = 3
-@export var height_min: float = 3.8
-@export var height_max: float = 5.6
+# Stalks grow up to the waterline (~y=18 with seafloor top at y=-0.5).
+@export var height_min: float = 16.0
+@export var height_max: float = 18.4
 @export var base_y: float = -0.4
 @export var sway_speed: float = 1.0
-@export var sway_amount: float = 0.28
+# Sway is anchored at the base and scales with mesh-local Y, so very tall stalks have very large absolute sway. Reduced compared to the short kelp to keep tip travel sane.
+@export var sway_amount: float = 0.06
 @export var kelp_color: Color = Color(0.05, 0.24, 0.13, 1.0)
 @export var add_collision: bool = true
 @export var collision_radius: float = 0.22

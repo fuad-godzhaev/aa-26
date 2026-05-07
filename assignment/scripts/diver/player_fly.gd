@@ -32,6 +32,9 @@ enum SwimPose { IDLE, FORWARD, BACK, LEFT, RIGHT }
 # Below this Y the depth gradient kicks in; above it the diver is in air.
 @export var surface_y: float = 18.0
 @export var fog_density_above_water: float = 0.004
+# Hard clamp on swim altitude. Allow the diver's head to poke through (head_poke meters above surface) but no flying further.
+@export var head_poke: float = 0.5
+@export var min_swim_y: float = 0.6
 
 @export_group("Goggles")
 @export var goggles_visible: bool = true
@@ -114,6 +117,16 @@ func _physics_process(delta: float) -> void:
 	# move_and_slide integrates by `velocity` and resolves collisions with
 	# the floor + kelp colliders; velocity is updated to the post-slide value.
 	move_and_slide()
+	# Clamp swim altitude after movement so the diver can poke their head out at the surface but can't actually fly.
+	var max_y: float = surface_y + head_poke
+	if global_position.y > max_y:
+		global_position.y = max_y
+		if velocity.y > 0.0:
+			velocity.y = 0.0
+	elif global_position.y < min_swim_y:
+		global_position.y = min_swim_y
+		if velocity.y < 0.0:
+			velocity.y = 0.0
 
 	var load: float = clampf(velocity.length() / maxf(move_speed, 0.001), 0.0, 1.0)
 	if is_sprinting:

@@ -3,6 +3,7 @@ extends Node3D
 
 # Breath cycle generator + regulator SFX + exhale bubbles. See ARCHITECTURE.md §5d.
 
+# TODO(placeholder): both WAVs are silent stubs; swap for real regulator inhale / exhale samples. See ARCHITECTURE.md §9.
 const BREATH_IN_PATH := "res://assignment/audio/PLACEHOLDER_breath_in.wav"
 const BREATH_OUT_PATH := "res://assignment/audio/PLACEHOLDER_breath_out.wav"
 
@@ -73,6 +74,7 @@ func _beat_exhale(ex: float) -> void:
 	_bubbles.emitting = true
 
 
+# TODO(placeholder): coded GPUParticles3D bubble burst; promote to an authored scene with refractive bubble shading. See ARCHITECTURE.md §9.
 func _make_bubbles() -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	var m := ParticleProcessMaterial.new()

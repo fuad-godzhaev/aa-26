@@ -97,6 +97,7 @@ func _idle_drift(phase: float, sx: float) -> Transform3D:
 
 
 # Forearm cylinder + fist sphere; muted wetsuit blue.
+# TODO(placeholder): CSG primitive stand-in for an arm/hand model. Swap for a rigged CC0 low-poly arm during polish. See ARCHITECTURE.md §9.
 func _make_hand() -> Node3D:
 	var root := Node3D.new()
 	var mat := StandardMaterial3D.new()

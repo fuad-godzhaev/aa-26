@@ -102,6 +102,16 @@ func _physics_process(delta: float) -> void:
 			vel = vel.normalized() * max_speed
 		pos += vel * delta
 
+		# Hard clamp to the swim band so fish can never breach the surface or sink into the floor; the soft containment force is the gentle nudge, this is the safety net.
+		if pos.y > max_y:
+			pos.y = max_y
+			if vel.y > 0.0:
+				vel.y = -vel.y * 0.3
+		elif pos.y < min_y:
+			pos.y = min_y
+			if vel.y < 0.0:
+				vel.y = -vel.y * 0.3
+
 		f["pos"] = pos
 		f["vel"] = vel
 		var mi: MeshInstance3D = f["mesh"]
@@ -125,6 +135,8 @@ func _spawn_fish(i: int, mat: StandardMaterial3D, mesh: Mesh) -> void:
 	mi.material_override = mat
 	mi.scale = Vector3.ONE * fish_scale
 	mi.position = pos
+	# Explicit so each fish casts a sun shadow on the seafloor.
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	add_child(mi)
 	_fish.append({"pos": pos, "vel": vel, "mesh": mi})
 

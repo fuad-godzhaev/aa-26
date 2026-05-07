@@ -24,6 +24,7 @@ func _ready() -> void:
 		_streams[mode] = _try_load(MODE_SOUND[mode])
 
 
+# TODO(placeholder): swap PLACEHOLDER_*.wav for real CC0/CC-BY samples; same filenames, no code change. See ARCHITECTURE.md §9.
 func _try_load(snd: String) -> AudioStream:
 	var path := "res://assignment/audio/PLACEHOLDER_%s.wav" % snd
 	if not ResourceLoader.exists(path):

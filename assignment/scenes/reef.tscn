@@ -9,17 +9,18 @@
 [ext_resource type="Script" path="res://assignment/scripts/world/fish_school.gd" id="7"]
 [ext_resource type="Shader" path="res://assignment/materials/water_surface.gdshader" id="8"]
 [ext_resource type="Script" path="res://assignment/scripts/world/surface_transition.gd" id="9"]
+[ext_resource type="AudioStream" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
-sky_horizon_color = Color(0.55, 0.78, 0.88, 1)
-sky_curve = 0.15
-sky_energy_multiplier = 1.05
-ground_bottom_color = Color(0.06, 0.16, 0.20, 1)
-ground_horizon_color = Color(0.30, 0.50, 0.55, 1)
-ground_curve = 0.10
-sun_angle_max = 28.0
-sun_curve = 0.15
+sky_horizon_color = Color(0.95, 0.72, 0.45, 1)
+sky_curve = 0.10
+sky_energy_multiplier = 1.20
+ground_bottom_color = Color(0.10, 0.20, 0.22, 1)
+ground_horizon_color = Color(0.85, 0.65, 0.40, 1)
+ground_curve = 0.08
+sun_angle_max = 32.0
+sun_curve = 0.10
 
 [sub_resource type="Sky" id="sky"]
 sky_material = SubResource("sky_mat")
@@ -28,15 +29,17 @@ sky_material = SubResource("sky_mat")
 background_mode = 2
 sky = SubResource("sky")
 ambient_light_source = 2
-ambient_light_color = Color(0.42, 0.6, 0.65, 1)
-ambient_light_energy = 1.1
+ambient_light_color = Color(0.62, 0.58, 0.42, 1)
+ambient_light_energy = 1.15
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 1.0
 glow_bloom = 0.12
 fog_enabled = true
-fog_light_color = Color(0.30, 0.55, 0.62, 1)
+fog_light_color = Color(0.62, 0.55, 0.40, 1)
 fog_density = 0.025
+fog_sun_scatter = 0.30
+fog_aerial_perspective = 0.85
 
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_color = Color(0.16, 0.18, 0.15, 1)
@@ -187,6 +190,16 @@ shader_parameter/foam_scale = 4.0
 shader_parameter/metallic = 0.30
 shader_parameter/roughness = 0.40
 
+[sub_resource type="FastNoiseLite" id="caustic_noise"]
+noise_type = 2
+frequency = 0.06
+
+[sub_resource type="NoiseTexture2D" id="caustic_texture"]
+width = 256
+height = 256
+seamless = true
+noise = SubResource("caustic_noise")
+
 [sub_resource type="StandardMaterial3D" id="wood_mat"]
 albedo_color = Color(0.30, 0.16, 0.07, 1)
 roughness = 0.72
@@ -234,10 +247,15 @@ size = Vector3(0.12, 0.12, 0.5)
 environment = SubResource("Env")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=185552698]
-transform = Transform3D(1, 0, 0, 0, 0.173648, -0.984808, 0, 0.984808, 0.173648, 0, 22, 0)
-light_color = Color(1.0, 0.96, 0.88, 1)
-light_energy = 1.9
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 22, 0)
+light_color = Color(1.0, 0.85, 0.55, 1)
+light_energy = 2.1
 shadow_enabled = true
+directional_shadow_max_distance = 120.0
+directional_shadow_split_1 = 0.06
+directional_shadow_split_2 = 0.22
+directional_shadow_split_3 = 0.5
+directional_shadow_blend_splits = true
 
 [node name="Seafloor" type="CSGCylinder3D" parent="." unique_id=1692862589]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
@@ -260,6 +278,21 @@ surface_material_override/0 = SubResource("water_mat")
 
 [node name="SurfaceTransition" type="Node3D" parent="." unique_id=1701070002]
 script = ExtResource("9")
+
+[node name="Caustics" type="SpotLight3D" parent="." unique_id=1701080001]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 14, 0)
+light_color = Color(0.85, 0.95, 1.0, 1)
+light_energy = 0.55
+shadow_enabled = false
+spot_range = 22.0
+spot_angle = 78.0
+spot_angle_attenuation = 0.6
+light_projector = SubResource("caustic_texture")
+
+[node name="AmbientAudio" type="AudioStreamPlayer" parent="." unique_id=1701080002]
+stream = ExtResource("10")
+volume_db = -18.0
+autoplay = true
 
 [node name="TreasureChest" type="StaticBody3D" parent="." unique_id=1457290631]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, -0.18, 5)

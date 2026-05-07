@@ -410,6 +410,7 @@ func _integrate_centre(force: Vector3, delta: float) -> void:
 		_c_pos.z = flat.z
 
 
+# TODO(placeholder): coded GPUParticles3D capture burst; promote to an authored particle scene during polish. See ARCHITECTURE.md §9.
 func _spawn_burst(at: Vector3) -> void:
 	var fx := GPUParticles3D.new()
 	var mat := ParticleProcessMaterial.new()
