@@ -1,43 +1,50 @@
 class_name FishSchool
 extends Node3D
 
-# Ambient flock — Boids (separation + alignment + cohesion) using SteeringBehaviors, with soft player + Gemini avoidance and circular containment. See ARCHITECTURE.md.
+# One tightly-grouped ambient fish school. Place several FishSchool nodes in the scene at different positions; each spawns ~count fish around its own origin and Boids-flocks them within a small bounds radius around that origin. Fish softly avoid the player and gemini_half (steering), and each fish carries an AnimatableBody3D collider so the diver bumps off them as a fallback. See ARCHITECTURE.md.
 
-@export var count: int = 36
-@export var spawn_radius: float = 12.0
-@export var bounds_radius: float = 24.0
-@export var min_y: float = 1.2
-@export var max_y: float = 13.0
-@export var max_speed: float = 2.4
-@export var max_force: float = 7.0
-@export var neighbour_radius: float = 3.2
-@export var avoid_radius: float = 5.0
-@export var sep_weight: float = 1.6
-@export var ali_weight: float = 1.0
-@export var coh_weight: float = 0.85
+@export var count: int = 12
+@export var spawn_radius: float = 3.0
+@export var bounds_radius: float = 5.5
+@export var min_y_offset: float = -2.0
+@export var max_y_offset: float = 2.0
+@export var max_speed: float = 2.0
+@export var max_force: float = 6.0
+@export var neighbour_radius: float = 3.5
+@export var avoid_radius: float = 4.0
+@export var sep_weight: float = 1.4
+@export var ali_weight: float = 1.1
+# Stronger cohesion so each school stays tightly grouped instead of dispersing.
+@export var coh_weight: float = 1.6
 @export var avoid_weight: float = 2.8
-@export var contain_weight: float = 1.4
-@export var fish_scale: float = 0.18
+@export var contain_weight: float = 1.6
+@export var fish_scale: float = 0.8
+@export var collider_radius: float = 0.18
+@export var collision_layer: int = 1
+@export var collision_mask: int = 1
 @export var fish_color: Color = Color(0.82, 0.92, 0.96, 1)
 @export var fish_emission: Color = Color(0.45, 0.65, 0.75, 1)
 @export var random_seed: int = 8675
 
-var _fish: Array = []  # each entry: { pos: Vector3, vel: Vector3, mesh: MeshInstance3D }
+var _center: Vector3
+var _fish: Array = []
 var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	_rng.seed = random_seed
+	# Each school is anchored to its node's global position at startup; containment pulls strays back toward this point, not the world origin.
+	_center = global_position
 	var mat := _make_material()
 	var mesh := _make_mesh()
 	for i in count:
-		_spawn_fish(i, mat, mesh)
+		_spawn_fish(mat, mesh)
 
 
 func _physics_process(delta: float) -> void:
 	if _fish.is_empty():
 		return
-	# Players are in group "player"; the two gemini halves are in "gemini_half".
+	# Soft avoidance of both the diver and gemini halves; the per-fish collider is a fallback so an inattentive diver still bumps the school instead of phasing through it.
 	var avoiders: Array[Vector3] = []
 	for p in get_tree().get_nodes_in_group("player"):
 		if p is Node3D:
@@ -46,7 +53,6 @@ func _physics_process(delta: float) -> void:
 		if h is Node3D:
 			avoiders.append((h as Node3D).global_position)
 
-	# Collect positions + velocities once per frame so we don't recompute per neighbour.
 	var positions: Array[Vector3] = []
 	var velocities: Array[Vector3] = []
 	for f in _fish:
@@ -80,73 +86,89 @@ func _physics_process(delta: float) -> void:
 		if avoid.length() > 0.001:
 			avoid = avoid.normalized() * max_speed - vel
 
-		# Soft containment back toward the centre once outside the bounds disc.
-		var flat := Vector3(pos.x, 0.0, pos.z)
+		# Soft containment back toward the school's own centre.
+		var offset := pos - _center
+		var flat := Vector3(offset.x, 0.0, offset.z)
 		var contain := Vector3.ZERO
 		if flat.length() > bounds_radius:
 			var to_centre := -flat.normalized() * max_speed
 			contain = to_centre - Vector3(vel.x, 0.0, vel.z)
-		# Vertical containment: gently steer back into the band.
-		if pos.y < min_y:
+		# Vertical band is also relative to the centre.
+		var rel_y := pos.y - _center.y
+		if rel_y < min_y_offset:
 			contain.y += (max_speed - vel.y)
-		elif pos.y > max_y:
+		elif rel_y > max_y_offset:
 			contain.y += (-max_speed - vel.y)
 
 		var force: Vector3 = sep * sep_weight + ali * ali_weight + coh * coh_weight + avoid * avoid_weight + contain * contain_weight
 		force = force.limit_length(max_force)
 
 		vel += force * delta
-		# Mild drag so flocks don't accumulate energy from repeated steering.
 		vel = vel.lerp(Vector3.ZERO, clampf(0.35 * delta, 0.0, 1.0))
 		if vel.length() > max_speed:
 			vel = vel.normalized() * max_speed
 		pos += vel * delta
 
-		# Hard clamp to the swim band so fish can never breach the surface or sink into the floor; the soft containment force is the gentle nudge, this is the safety net.
-		if pos.y > max_y:
-			pos.y = max_y
+		# Hard clamp so fish never escape their school's volume.
+		var clamped_flat := Vector3(pos.x - _center.x, 0.0, pos.z - _center.z)
+		if clamped_flat.length() > bounds_radius:
+			var n := clamped_flat.normalized()
+			pos.x = _center.x + n.x * bounds_radius
+			pos.z = _center.z + n.z * bounds_radius
+			var outward := vel.dot(Vector3(n.x, 0.0, n.z))
+			if outward > 0.0:
+				vel -= Vector3(n.x, 0.0, n.z) * outward
+		if pos.y - _center.y > max_y_offset:
+			pos.y = _center.y + max_y_offset
 			if vel.y > 0.0:
 				vel.y = -vel.y * 0.3
-		elif pos.y < min_y:
-			pos.y = min_y
+		elif pos.y - _center.y < min_y_offset:
+			pos.y = _center.y + min_y_offset
 			if vel.y < 0.0:
 				vel.y = -vel.y * 0.3
 
 		f["pos"] = pos
 		f["vel"] = vel
-		var mi: MeshInstance3D = f["mesh"]
-		mi.global_position = pos
+		var body: AnimatableBody3D = f["body"]
+		body.global_position = pos
 		if vel.length() > 0.08:
-			mi.look_at(mi.global_position + vel, Vector3.UP)
+			body.look_at(body.global_position + vel, Vector3.UP)
 
 
-func _spawn_fish(i: int, mat: StandardMaterial3D, mesh: Mesh) -> void:
+func _spawn_fish(mat: StandardMaterial3D, mesh: Mesh) -> void:
 	var a: float = _rng.randf() * TAU
 	var r: float = _rng.randf() * spawn_radius
-	var y: float = _rng.randf_range(min_y, max_y)
-	var pos := Vector3(cos(a) * r, y, sin(a) * r)
+	var y_off: float = _rng.randf_range(min_y_offset, max_y_offset)
+	var pos := _center + Vector3(cos(a) * r, y_off, sin(a) * r)
 	var dir := Vector3(_rng.randf_range(-1.0, 1.0), 0.0, _rng.randf_range(-1.0, 1.0))
 	if dir.length_squared() < 0.001:
 		dir = Vector3.FORWARD
 	var vel := dir.normalized() * max_speed * _rng.randf_range(0.4, 0.9)
 
+	var body := AnimatableBody3D.new()
+	body.position = pos
+	body.scale = Vector3.ONE * fish_scale
+	body.collision_layer = collision_layer
+	body.collision_mask = collision_mask
+	body.sync_to_physics = false
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
 	mi.material_override = mat
-	mi.scale = Vector3.ONE * fish_scale
-	mi.position = pos
-	# Explicit so each fish casts a sun shadow on the seafloor.
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	add_child(mi)
-	_fish.append({"pos": pos, "vel": vel, "mesh": mi})
+	body.add_child(mi)
+	var col := CollisionShape3D.new()
+	var shape := SphereShape3D.new()
+	shape.radius = collider_radius
+	col.shape = shape
+	body.add_child(col)
+	add_child(body)
+	_fish.append({"pos": pos, "vel": vel, "body": body})
 
 
-# Tiny silvery capsule oriented along +Z (so look_at points the head into velocity).
 func _make_mesh() -> Mesh:
 	var m := CapsuleMesh.new()
 	m.radius = 0.07
 	m.height = 0.32
-	# CapsuleMesh stands along +Y by default; rotate via a wrapper? Simpler: leave it standing — the per-fish look_at will orient appropriately. The fish read as an elongated body either way.
 	return m
 
 

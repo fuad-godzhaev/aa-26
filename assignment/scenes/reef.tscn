@@ -2,25 +2,25 @@
 
 [ext_resource type="Script" uid="uid://c77wi2olpyxvu" path="res://assignment/scripts/diver/player_fly.gd" id="1"]
 [ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/diver/player_probe.gd" id="2"]
-[ext_resource type="Script" path="res://assignment/scripts/gemini/gemini_controller.gd" id="3"]
+[ext_resource type="Script" uid="uid://fq8ja6kavdim" path="res://assignment/scripts/gemini/gemini_controller.gd" id="3"]
 [ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
-[ext_resource type="Script" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
-[ext_resource type="Script" path="res://assignment/scripts/world/fish_school.gd" id="7"]
-[ext_resource type="Shader" path="res://assignment/materials/water_surface.gdshader" id="8"]
-[ext_resource type="Script" path="res://assignment/scripts/world/surface_transition.gd" id="9"]
-[ext_resource type="AudioStream" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
+[ext_resource type="Script" uid="uid://bsr68e2j7yjga" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
+[ext_resource type="Script" uid="uid://cb0buom0uvbol" path="res://assignment/scripts/world/fish_school.gd" id="7"]
+[ext_resource type="Shader" uid="uid://bq514saeqouwc" path="res://assignment/materials/water_surface.gdshader" id="8"]
+[ext_resource type="Script" uid="uid://be5dddt0c67kj" path="res://assignment/scripts/world/surface_transition.gd" id="9"]
+[ext_resource type="AudioStream" uid="uid://dbirp78q7u4sw" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
 sky_horizon_color = Color(0.95, 0.72, 0.45, 1)
-sky_curve = 0.10
-sky_energy_multiplier = 1.20
-ground_bottom_color = Color(0.10, 0.20, 0.22, 1)
-ground_horizon_color = Color(0.85, 0.65, 0.40, 1)
+sky_curve = 0.1
+sky_energy_multiplier = 1.2
+ground_bottom_color = Color(0.1, 0.2, 0.22, 1)
+ground_horizon_color = Color(0.85, 0.65, 0.4, 1)
 ground_curve = 0.08
 sun_angle_max = 32.0
-sun_curve = 0.10
+sun_curve = 0.1
 
 [sub_resource type="Sky" id="sky"]
 sky_material = SubResource("sky_mat")
@@ -36,9 +36,9 @@ glow_enabled = true
 glow_intensity = 1.0
 glow_bloom = 0.12
 fog_enabled = true
-fog_light_color = Color(0.62, 0.55, 0.40, 1)
+fog_light_color = Color(0.62, 0.55, 0.4, 1)
+fog_sun_scatter = 0.3
 fog_density = 0.025
-fog_sun_scatter = 0.30
 fog_aerial_perspective = 0.85
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.018
@@ -47,14 +47,63 @@ volumetric_fog_emission_energy = 0.0
 volumetric_fog_gi_inject = 0.4
 volumetric_fog_anisotropy = 0.55
 volumetric_fog_length = 80.0
-volumetric_fog_detail_spread = 2.0
 volumetric_fog_ambient_inject = 0.4
-volumetric_fog_temporal_reprojection_enabled = true
-volumetric_fog_temporal_reprojection_amount = 0.9
 
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_color = Color(0.16, 0.18, 0.15, 1)
 roughness = 0.94
+
+[sub_resource type="PlaneMesh" id="water_mesh"]
+size = Vector2(220, 220)
+subdivide_width = 60
+subdivide_depth = 60
+
+[sub_resource type="ShaderMaterial" id="water_mat"]
+render_priority = 0
+shader = ExtResource("8")
+shader_parameter/deep_color = Color(0.1, 0.32, 0.42, 0.95)
+shader_parameter/crest_color = Color(0.55, 0.82, 0.92, 0.85)
+shader_parameter/underside_color = Color(0.18, 0.42, 0.50, 0.97)
+shader_parameter/wave_speed = 0.6
+shader_parameter/wave_freq = 0.18
+shader_parameter/wave_amp = 0.22
+shader_parameter/metallic = 0.05
+shader_parameter/roughness = 0.45
+
+[sub_resource type="FastNoiseLite" id="caustic_noise"]
+noise_type = 2
+frequency = 0.06
+
+[sub_resource type="NoiseTexture2D" id="caustic_texture"]
+width = 256
+height = 256
+noise = SubResource("caustic_noise")
+seamless = true
+
+[sub_resource type="StandardMaterial3D" id="wood_mat"]
+albedo_color = Color(0.3, 0.16, 0.07, 1)
+metallic = 0.04
+roughness = 0.72
+
+[sub_resource type="StandardMaterial3D" id="trim_mat"]
+albedo_color = Color(0.18, 0.1, 0.04, 1)
+metallic = 0.05
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="gold_mat"]
+albedo_color = Color(0.95, 0.78, 0.25, 1)
+metallic = 0.9
+roughness = 0.25
+emission_enabled = true
+emission = Color(0.55, 0.42, 0.1, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="chest_glow"]
+shading_mode = 0
+albedo_color = Color(1, 0.88, 0.4, 1)
+
+[sub_resource type="BoxShape3D" id="chest_shape"]
+size = Vector3(1.4, 0.84, 0.85)
 
 [sub_resource type="StandardMaterial3D" id="rock_mat"]
 albedo_color = Color(0.18, 0.22, 0.22, 1)
@@ -68,9 +117,6 @@ roughness = 0.92
 radius = 0.6
 height = 1.2
 
-[sub_resource type="SphereShape3D" id="coral_shape"]
-radius = 0.65
-
 [sub_resource type="ShaderMaterial" id="glow_coral"]
 render_priority = 0
 shader = ExtResource("4")
@@ -80,6 +126,9 @@ shader_parameter/pulse_speed = 0.6
 shader_parameter/pulse_strength = 0.4
 shader_parameter/rim_strength = 1.0
 shader_parameter/emission_energy = 1.8
+
+[sub_resource type="SphereShape3D" id="coral_shape"]
+radius = 0.65
 
 [sub_resource type="ShaderMaterial" id="glow_coral_pink"]
 render_priority = 0
@@ -117,10 +166,6 @@ bottom_radius = 0.08
 height = 4.0
 radial_segments = 8
 
-[sub_resource type="CylinderShape3D" id="kelp_shape"]
-radius = 0.18
-height = 4.0
-
 [sub_resource type="ShaderMaterial" id="kelp_mat"]
 render_priority = 0
 shader = ExtResource("5")
@@ -128,20 +173,24 @@ shader_parameter/kelp_color = Color(0.04, 0.24, 0.12, 1)
 shader_parameter/sway_speed = 1.0
 shader_parameter/sway_amount = 0.28
 
+[sub_resource type="CylinderShape3D" id="kelp_shape"]
+height = 4.0
+radius = 0.18
+
 [sub_resource type="StandardMaterial3D" id="starfish_orange"]
 albedo_color = Color(0.92, 0.42, 0.18, 1)
-roughness = 0.55
 metallic = 0.05
+roughness = 0.55
 
 [sub_resource type="StandardMaterial3D" id="starfish_amber"]
 albedo_color = Color(0.88, 0.65, 0.22, 1)
-roughness = 0.55
 metallic = 0.05
+roughness = 0.55
 
 [sub_resource type="StandardMaterial3D" id="starfish_violet"]
-albedo_color = Color(0.55, 0.30, 0.72, 1)
-roughness = 0.55
+albedo_color = Color(0.55, 0.3, 0.72, 1)
 metallic = 0.05
+roughness = 0.55
 
 [sub_resource type="ParticleProcessMaterial" id="snow_proc"]
 emission_shape = 3
@@ -164,6 +213,11 @@ billboard_keep_scale = true
 material = SubResource("snow_mat")
 size = Vector2(0.035, 0.035)
 
+[sub_resource type="SphereShape3D" id="gem_shape"]
+radius = 0.6
+
+[sub_resource type="SphereMesh" id="hull_mesh"]
+
 [sub_resource type="ShaderMaterial" id="glow_body"]
 render_priority = 0
 shader = ExtResource("4")
@@ -173,70 +227,6 @@ shader_parameter/pulse_speed = 1.5
 shader_parameter/pulse_strength = 0.55
 shader_parameter/rim_strength = 1.6
 shader_parameter/emission_energy = 2.2
-
-[sub_resource type="SphereShape3D" id="gem_shape"]
-radius = 0.6
-
-[sub_resource type="CapsuleShape3D" id="diver_shape"]
-radius = 0.45
-height = 1.7
-
-[sub_resource type="BoxShape3D" id="chest_shape"]
-size = Vector3(1.4, 0.84, 0.85)
-
-[sub_resource type="PlaneMesh" id="water_mesh"]
-size = Vector2(80, 80)
-subdivide_width = 32
-subdivide_depth = 32
-
-[sub_resource type="ShaderMaterial" id="water_mat"]
-render_priority = 0
-shader = ExtResource("8")
-shader_parameter/deep_color = Color(0.10, 0.32, 0.42, 0.65)
-shader_parameter/shallow_color = Color(0.55, 0.85, 0.92, 0.45)
-shader_parameter/wave_speed = 0.6
-shader_parameter/wave_freq = 0.18
-shader_parameter/wave_amp = 0.22
-shader_parameter/foam_scale = 4.0
-shader_parameter/metallic = 0.30
-shader_parameter/roughness = 0.40
-
-[sub_resource type="FastNoiseLite" id="caustic_noise"]
-noise_type = 2
-frequency = 0.06
-
-[sub_resource type="NoiseTexture2D" id="caustic_texture"]
-width = 256
-height = 256
-seamless = true
-noise = SubResource("caustic_noise")
-
-[sub_resource type="StandardMaterial3D" id="wood_mat"]
-albedo_color = Color(0.30, 0.16, 0.07, 1)
-roughness = 0.72
-metallic = 0.04
-
-[sub_resource type="StandardMaterial3D" id="trim_mat"]
-albedo_color = Color(0.18, 0.10, 0.04, 1)
-roughness = 0.6
-metallic = 0.05
-
-[sub_resource type="StandardMaterial3D" id="gold_mat"]
-albedo_color = Color(0.95, 0.78, 0.25, 1)
-roughness = 0.25
-metallic = 0.9
-emission_enabled = true
-emission = Color(0.55, 0.42, 0.10, 1)
-emission_energy_multiplier = 0.5
-
-[sub_resource type="StandardMaterial3D" id="chest_glow"]
-shading_mode = 0
-albedo_color = Color(1.0, 0.88, 0.40, 1)
-emission_enabled = true
-emission = Color(1.0, 0.82, 0.30, 1)
-emission_energy_multiplier = 3.0
-
-[sub_resource type="SphereMesh" id="hull_mesh"]
 
 [sub_resource type="SphereMesh" id="eye_mesh"]
 radius = 0.08
@@ -252,6 +242,10 @@ size = Vector3(0.6, 0.04, 0.4)
 [sub_resource type="BoxMesh" id="tail_mesh"]
 size = Vector3(0.12, 0.12, 0.5)
 
+[sub_resource type="CapsuleShape3D" id="diver_shape"]
+radius = 0.45
+height = 1.7
+
 [node name="reef" type="Node3D" unique_id=1623239213]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1653996051]
@@ -259,29 +253,54 @@ environment = SubResource("Env")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=185552698]
 transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 22, 0)
-light_color = Color(1.0, 0.85, 0.55, 1)
+light_color = Color(1, 0.85, 0.55, 1)
 light_energy = 2.1
 light_volumetric_fog_energy = 1.6
 shadow_enabled = true
-directional_shadow_max_distance = 120.0
 directional_shadow_split_1 = 0.06
 directional_shadow_split_2 = 0.22
-directional_shadow_split_3 = 0.5
 directional_shadow_blend_splits = true
+directional_shadow_max_distance = 120.0
 
 [node name="Seafloor" type="CSGCylinder3D" parent="." unique_id=1692862589]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+use_collision = true
 radius = 30.0
 height = 1.0
 sides = 64
-use_collision = true
 material = SubResource("floor_mat")
 
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")
 
-[node name="FishSchool" type="Node3D" parent="." unique_id=1701060001]
+[node name="FishSchoolA" type="Node3D" parent="." unique_id=1701060001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, -8)
 script = ExtResource("7")
+random_seed = 8675
+
+[node name="FishSchoolB" type="Node3D" parent="." unique_id=1701060002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 7, -6)
+script = ExtResource("7")
+random_seed = 4131
+fish_color = Color(0.92, 0.78, 0.55, 1)
+fish_emission = Color(0.85, 0.55, 0.25, 1)
+
+[node name="FishSchoolC" type="Node3D" parent="." unique_id=1701060003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 12)
+script = ExtResource("7")
+random_seed = 9912
+count = 14
+spawn_radius = 3.5
+fish_color = Color(0.70, 0.85, 0.95, 1)
+fish_emission = Color(0.35, 0.65, 0.85, 1)
+
+[node name="FishSchoolD" type="Node3D" parent="." unique_id=1701060004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4, 14)
+script = ExtResource("7")
+random_seed = 5510
+count = 10
+fish_color = Color(0.85, 0.65, 0.78, 1)
+fish_emission = Color(0.70, 0.40, 0.60, 1)
 
 [node name="WaterSurface" type="MeshInstance3D" parent="." unique_id=1701070001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
@@ -293,13 +312,12 @@ script = ExtResource("9")
 
 [node name="Caustics" type="SpotLight3D" parent="." unique_id=1701080001]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 14, 0)
-light_color = Color(0.85, 0.95, 1.0, 1)
+light_color = Color(0.85, 0.95, 1, 1)
 light_energy = 0.55
-shadow_enabled = false
+light_projector = SubResource("caustic_texture")
 spot_range = 22.0
 spot_angle = 78.0
 spot_angle_attenuation = 0.6
-light_projector = SubResource("caustic_texture")
 
 [node name="AmbientAudio" type="AudioStreamPlayer" parent="." unique_id=1701080002]
 stream = ExtResource("10")
@@ -325,7 +343,7 @@ size = Vector3(1.45, 0.08, 0.04)
 material = SubResource("trim_mat")
 
 [node name="Lid" type="CSGBox3D" parent="TreasureChest" unique_id=1928374650]
-transform = Transform3D(1, 0, 0, 0, 0.939693, -0.342020, 0, 0.342020, 0.939693, 0, 0.78, -0.05)
+transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 0.78, -0.05)
 size = Vector3(1.4, 0.18, 0.85)
 material = SubResource("wood_mat")
 
@@ -347,62 +365,62 @@ shape = SubResource("chest_shape")
 
 [node name="Rock1" type="CSGSphere3D" parent="." unique_id=1270249979]
 transform = Transform3D(2.2, 0, 0, 0, 1.4, 0, 0, 0, 2.2, -8, 0, -6)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="Rock2" type="CSGSphere3D" parent="." unique_id=1102409192]
 transform = Transform3D(1.6, 0, 0, 0, 1.1, 0, 0, 0, 1.6, 9, 0, 4)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="RockA" type="CSGSphere3D" parent="." unique_id=1701020001]
 transform = Transform3D(1.4, 0, 0, 0, 0.9, 0, 0, 0, 1.2, -15, 0, 8)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="RockB" type="CSGSphere3D" parent="." unique_id=1701020002]
-transform = Transform3D(2.0, 0, 0, 0, 1.0, 0, 0, 0, 1.6, -12, 0, -14)
-radius = 1.5
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1.6, -12, 0, -14)
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat_mossy")
 
 [node name="RockC" type="CSGSphere3D" parent="." unique_id=1701020003]
-transform = Transform3D(1.0, 0, 0, 0, 0.6, 0, 0, 0, 1.0, 4, 0.1, -16)
-radius = 1.5
+transform = Transform3D(1, 0, 0, 0, 0.6, 0, 0, 0, 1, 4, 0.1, -16)
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="RockD" type="CSGSphere3D" parent="." unique_id=1701020004]
 transform = Transform3D(1.6, 0, 0, 0, 1.2, 0, 0, 0, 1.4, 15, 0, -10)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat_mossy")
 
 [node name="RockE" type="CSGSphere3D" parent="." unique_id=1701020005]
 transform = Transform3D(1.2, 0, 0, 0, 0.8, 0, 0, 0, 1.5, 18, 0, 8)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="RockF" type="CSGSphere3D" parent="." unique_id=1701020006]
 transform = Transform3D(0.9, 0, 0, 0, 0.7, 0, 0, 0, 1.1, -18, 0, -4)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat_mossy")
 
 [node name="RockG" type="CSGSphere3D" parent="." unique_id=1701020007]
 transform = Transform3D(1.5, 0, 0, 0, 0.9, 0, 0, 0, 1.2, 0, 0, 18)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat")
 
 [node name="RockH" type="CSGSphere3D" parent="." unique_id=1701020008]
 transform = Transform3D(0.7, 0, 0, 0, 0.5, 0, 0, 0, 0.8, -4, 0.1, 14)
-radius = 1.5
 use_collision = true
+radius = 1.5
 material = SubResource("rock_mat_mossy")
 
 [node name="Coral1" type="StaticBody3D" parent="." unique_id=524779337]
@@ -464,7 +482,7 @@ shape = SubResource("coral_shape")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.15, 16)
 
 [node name="Mesh" type="MeshInstance3D" parent="CoralC" unique_id=1701030031]
-transform = Transform3D(1.0, 0, 0, 0, 1.2, 0, 0, 0, 1.0, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("coral_mesh")
 surface_material_override/0 = SubResource("glow_coral_green")
 
@@ -475,7 +493,7 @@ shape = SubResource("coral_shape")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.2, 12)
 
 [node name="Mesh" type="MeshInstance3D" parent="CoralD" unique_id=1701030041]
-transform = Transform3D(1.3, 0, 0, 0, 1.0, 0, 0, 0, 1.3, 0, 0, 0)
+transform = Transform3D(1.3, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0, 0)
 mesh = SubResource("coral_mesh")
 surface_material_override/0 = SubResource("glow_coral_pink")
 
@@ -613,350 +631,350 @@ shape = SubResource("kelp_shape")
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 4, -0.42, 1)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishA" unique_id=1701050011]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_orange")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishA" unique_id=1701050012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishA" unique_id=1701050013]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishA" unique_id=1701050014]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishA" unique_id=1701050015]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishA" unique_id=1701050016]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="StarfishB" type="Node3D" parent="." unique_id=1701050002]
 transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.1, -2, -0.42, 5)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishB" unique_id=1701050021]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_amber")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishB" unique_id=1701050022]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishB" unique_id=1701050023]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishB" unique_id=1701050024]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishB" unique_id=1701050025]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishB" unique_id=1701050026]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="StarfishC" type="Node3D" parent="." unique_id=1701050003]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 9, -0.42, -8)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishC" unique_id=1701050031]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_violet")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishC" unique_id=1701050032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishC" unique_id=1701050033]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishC" unique_id=1701050034]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishC" unique_id=1701050035]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishC" unique_id=1701050036]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="StarfishD" type="Node3D" parent="." unique_id=1701050004]
 transform = Transform3D(0.9, 0, 0, 0, 1, 0, 0, 0, 0.9, -6, -0.42, -2)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishD" unique_id=1701050041]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_orange")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishD" unique_id=1701050042]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishD" unique_id=1701050043]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishD" unique_id=1701050044]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishD" unique_id=1701050045]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishD" unique_id=1701050046]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="StarfishE" type="Node3D" parent="." unique_id=1701050005]
 transform = Transform3D(1.05, 0, 0, 0, 1, 0, 0, 0, 1.05, 12, -0.42, 9)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishE" unique_id=1701050051]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_amber")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishE" unique_id=1701050052]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishE" unique_id=1701050053]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishE" unique_id=1701050054]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishE" unique_id=1701050055]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishE" unique_id=1701050056]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="StarfishF" type="Node3D" parent="." unique_id=1701050006]
 transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -13, -0.42, 3)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishF" unique_id=1701050061]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_violet")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishF" unique_id=1701050062]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishF" unique_id=1701050063]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishF" unique_id=1701050064]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishF" unique_id=1701050065]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishF" unique_id=1701050066]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_violet")
 
 [node name="StarfishG" type="Node3D" parent="." unique_id=1701050007]
 transform = Transform3D(0.95, 0, 0, 0, 1, 0, 0, 0, 0.95, 0, -0.42, -10)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishG" unique_id=1701050071]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_orange")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishG" unique_id=1701050072]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishG" unique_id=1701050073]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishG" unique_id=1701050074]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishG" unique_id=1701050075]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishG" unique_id=1701050076]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="StarfishH" type="Node3D" parent="." unique_id=1701050008]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -4, -0.42, -11)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishH" unique_id=1701050081]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_amber")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishH" unique_id=1701050082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishH" unique_id=1701050083]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishH" unique_id=1701050084]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishH" unique_id=1701050085]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishH" unique_id=1701050086]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="StarfishI" type="Node3D" parent="." unique_id=1701050009]
-transform = Transform3D(1.0, 0, 0, 0, 1, 0, 0, 0, 1.0, 17, -0.42, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.42, 0)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishI" unique_id=1701050091]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_orange")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishI" unique_id=1701050092]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishI" unique_id=1701050093]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishI" unique_id=1701050094]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishI" unique_id=1701050095]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishI" unique_id=1701050096]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_orange")
 
 [node name="StarfishJ" type="Node3D" parent="." unique_id=1701050010]
 transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 3, -0.42, 13)
 
 [node name="Centre" type="CSGCylinder3D" parent="StarfishJ" unique_id=1701050101]
+use_collision = true
 radius = 0.18
 height = 0.06
 sides = 16
-use_collision = true
 material = SubResource("starfish_amber")
 
 [node name="Arm1" type="CSGBox3D" parent="StarfishJ" unique_id=1701050102]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.175)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm2" type="CSGBox3D" parent="StarfishJ" unique_id=1701050103]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm3" type="CSGBox3D" parent="StarfishJ" unique_id=1701050104]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm4" type="CSGBox3D" parent="StarfishJ" unique_id=1701050105]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, -0.103, 0, 0.142)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="Arm5" type="CSGBox3D" parent="StarfishJ" unique_id=1701050106]
 transform = Transform3D(0.309017, 0, -0.951057, 0, 1, 0, 0.951057, 0, 0.309017, -0.166, 0, -0.054)
-size = Vector3(0.10, 0.05, 0.35)
+size = Vector3(0.1, 0.05, 0.35)
 material = SubResource("starfish_amber")
 
 [node name="MarineSnow" type="GPUParticles3D" parent="." unique_id=1992921152]

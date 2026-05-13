@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c6m5rc3lcpmth"]
+[gd_scene format=3 uid="uid://dluvjmdwgtnt7"]
 
 [ext_resource type="Script" uid="uid://c77wi2olpyxvu" path="res://assignment/scripts/diver/player_fly.gd" id="1"]
 [ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/diver/player_probe.gd" id="2"]
@@ -174,21 +174,21 @@ height = 1.7
 size = Vector3(1.4, 0.84, 0.85)
 
 [sub_resource type="PlaneMesh" id="water_mesh"]
-size = Vector2(80, 80)
-subdivide_width = 32
-subdivide_depth = 32
+size = Vector2(220, 220)
+subdivide_width = 60
+subdivide_depth = 60
 
 [sub_resource type="ShaderMaterial" id="water_mat"]
 render_priority = 0
 shader = ExtResource("8")
-shader_parameter/deep_color = Color(0.10, 0.32, 0.42, 0.65)
-shader_parameter/shallow_color = Color(0.55, 0.85, 0.92, 0.45)
+shader_parameter/deep_color = Color(0.10, 0.32, 0.42, 0.95)
+shader_parameter/crest_color = Color(0.55, 0.82, 0.92, 0.85)
+shader_parameter/underside_color = Color(0.18, 0.42, 0.50, 0.97)
 shader_parameter/wave_speed = 0.6
 shader_parameter/wave_freq = 0.18
 shader_parameter/wave_amp = 0.22
-shader_parameter/foam_scale = 4.0
-shader_parameter/metallic = 0.30
-shader_parameter/roughness = 0.40
+shader_parameter/metallic = 0.05
+shader_parameter/roughness = 0.45
 
 [sub_resource type="FastNoiseLite" id="caustic_noise"]
 noise_type = 2
@@ -268,8 +268,34 @@ material = SubResource("floor_mat")
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")
 
-[node name="FishSchool" type="Node3D" parent="." unique_id=1701060001]
+[node name="FishSchoolA" type="Node3D" parent="." unique_id=1701060001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, -8)
 script = ExtResource("7")
+random_seed = 8675
+
+[node name="FishSchoolB" type="Node3D" parent="." unique_id=1701060002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 7, -6)
+script = ExtResource("7")
+random_seed = 4131
+fish_color = Color(0.92, 0.78, 0.55, 1)
+fish_emission = Color(0.85, 0.55, 0.25, 1)
+
+[node name="FishSchoolC" type="Node3D" parent="." unique_id=1701060003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 12)
+script = ExtResource("7")
+random_seed = 9912
+count = 14
+spawn_radius = 3.5
+fish_color = Color(0.70, 0.85, 0.95, 1)
+fish_emission = Color(0.35, 0.65, 0.85, 1)
+
+[node name="FishSchoolD" type="Node3D" parent="." unique_id=1701060004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4, 14)
+script = ExtResource("7")
+random_seed = 5510
+count = 10
+fish_color = Color(0.85, 0.65, 0.78, 1)
+fish_emission = Color(0.70, 0.40, 0.60, 1)
 
 [node name="WaterSurface" type="MeshInstance3D" parent="." unique_id=1701070001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
