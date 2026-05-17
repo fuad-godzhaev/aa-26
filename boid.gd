@@ -32,8 +32,8 @@ func arrive():
 	return desired - velocity
 
 
-func seek():
-	var to_target = target.global_position - global_position
+func seek(target:Vector3):
+	var to_target = target - global_position
 	var desired:Vector3 = to_target.normalized() * max_speed
 	DebugDraw3D.draw_arrow(global_position, global_position + desired, Color.DARK_ORANGE, 0.1)
 
@@ -42,13 +42,20 @@ func seek():
 func player_steering():
 	pass
 
+var current_waypoint = 0
+
 func follow_path():
-	pass
+	var target = path.global_transform * path.curve.get_point_position(current_waypoint)
+	var dist = target.distance_to(global_position)
+	$"../pos_label".text = str(dist)
+	if dist < 0.5:
+		current_waypoint = (current_waypoint + 1) % path.curve.point_count
+	return seek(target)
 
 func calculate_force():
 	var f:Vector3
 	if seek_enabled:
-		f += seek()
+		f += seek(target.global_position)
 	if arrive_enabled:
 		f += arrive()
 	if path_follow_enabled:
@@ -72,5 +79,5 @@ func _physics_process(delta: float) -> void:
 	
 	# DebugDraw3D.draw_arrow(global_position, global_position + global_basis.z, Color.BURLYWOOD, 0.1)
 	DebugDraw3D.draw_arrow(global_position, global_position + velocity, Color.CORNFLOWER_BLUE, 0.1)
-	DebugDraw3D.draw_arrow(global_position, global_position + global_basis.y * 5, Color.RED)
+	# DebugDraw3D.draw_arrow(global_position, global_position + global_basis.y * 5, Color.RED)
 	

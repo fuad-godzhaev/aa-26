@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://cef1kwaivjcta" path="res://boid.gd" id="1_g7hsx"]
 [ext_resource type="Script" uid="uid://cbafjbwp2jn6" path="res://target.gd" id="2_q6o6m"]
+[ext_resource type="Script" uid="uid://dermslbu26jt3" path="res://path_drawer.gd" id="3_dik45"]
 [ext_resource type="Script" uid="uid://c4ceu1f2nid34" path="res://path_follow_3d.gd" id="3_tgpyc"]
+[ext_resource type="Script" uid="uid://cxxx5a7dij3o" path="res://tpc.gd" id="4_p2fuv"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7qd4g"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -68,14 +70,15 @@ offset_right = 171.0
 offset_bottom = 139.0
 text = "Position:"
 
-[node name="boid" type="CharacterBody3D" parent="." unique_id=783108805 node_paths=PackedStringArray("target")]
+[node name="boid" type="CharacterBody3D" parent="." unique_id=783108805 node_paths=PackedStringArray("target", "path")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 script = ExtResource("1_g7hsx")
 target = NodePath("../target")
 speed = 1.0
-max_speed = 1.0
 slowing_distance = 4.0
 banking = 5.0
+path_follow_enabled = true
+path = NodePath("../Path3D")
 
 [node name="box" type="MeshInstance3D" parent="boid" unique_id=1847198114]
 mesh = SubResource("BoxMesh_7qd4g")
@@ -94,7 +97,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0246034, -1.7231966)
 shape = SubResource("WorldBoundaryShape3D_q6o6m")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1369783904]
-visible = false
 mesh = SubResource("PlaneMesh_q6o6m")
 surface_material_override/0 = SubResource("StandardMaterial3D_tgpyc")
 
@@ -113,6 +115,7 @@ autostart = true
 [node name="Path3D" type="Path3D" parent="." unique_id=270280214]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.2354813, 0)
 curve = SubResource("Curve3D_q6o6m")
+script = ExtResource("3_dik45")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=839837693]
 transform = Transform3D(-0.7887163, 0, 0.61475253, 0, 1, 0, -0.61475253, 0, -0.7887163, -26.957905, 0, -12.22068)
@@ -123,5 +126,6 @@ mesh = SubResource("BoxMesh_q6o6m")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=325245612]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -27.181686, 31.30457, -12.966545)
+script = ExtResource("4_p2fuv")
 
 [connection signal="timeout" from="target/Timer" to="target" method="_on_timer_timeout"]
