@@ -20,6 +20,8 @@ const KELP_SHADER := preload("res://assignment/materials/kelp.gdshader")
 @export var kelp_color: Color = Color(0.05, 0.24, 0.13, 1.0)
 @export var add_collision: bool = true
 @export var collision_radius: float = 0.22
+@export var stalk_top_radius: float = 0.04
+@export var stalk_bottom_radius: float = 0.08
 @export var random_seed: int = 1729
 
 var _rng := RandomNumberGenerator.new()
@@ -67,8 +69,8 @@ func _spawn_stalk(i: int, mat: ShaderMaterial, r_base: float, ring_index: int) -
 
 	var mi := MeshInstance3D.new()
 	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.04
-	mesh.bottom_radius = 0.08
+	mesh.top_radius = stalk_top_radius
+	mesh.bottom_radius = stalk_bottom_radius
 	mesh.height = h
 	mesh.radial_segments = 8
 	mi.mesh = mesh
