@@ -1,27 +1,39 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye.gd" id="1"]
-[ext_resource type="Shader" path="res://assignment/materials/glow.gdshader" id="2"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye_mesh.gd" id="2"]
+[ext_resource type="Script" path="res://assignment/scripts/gemini/eye_tracker.gd" id="3"]
+[ext_resource type="Shader" path="res://assignment/materials/glow_v2.gdshader" id="4"]
+[ext_resource type="Shader" path="res://assignment/materials/fin_sway.gdshader" id="5"]
 
-[sub_resource type="ShaderMaterial" id="gm"]
-shader = ExtResource("2")
+[sub_resource type="ShaderMaterial" id="glow_mat"]
+shader = ExtResource("4")
 shader_parameter/base_color = Color(0.04, 0.16, 0.2, 1)
 shader_parameter/glow_color = Color(0.15, 0.85, 0.9, 1)
+shader_parameter/belly_color = Color(0.95, 0.9, 0.75, 1)
 shader_parameter/pulse_speed = 1.4
 shader_parameter/pulse_strength = 0.5
-shader_parameter/rim_strength = 1.6
+shader_parameter/rim_strength = 2.4
+shader_parameter/rim_curve = 3.0
 shader_parameter/emission_energy = 2.2
+shader_parameter/emission_pulse = 1.0
+shader_parameter/saturation = 1.2
 
-[sub_resource type="SphereMesh" id="hull"]
-radius = 0.5
-height = 1.0
+[sub_resource type="ShaderMaterial" id="fin_mat"]
+shader = ExtResource("5")
+shader_parameter/sway_speed = 2.0
+shader_parameter/sway_amount = 0.05
+shader_parameter/sway_freq = 1.8
+shader_parameter/fin_length = 0.1
+shader_parameter/tint = Color(0.15, 0.85, 0.9, 1)
+shader_parameter/emission_energy = 1.2
 
-[sub_resource type="SphereMesh" id="eye"]
-radius = 0.09
-height = 0.18
+[sub_resource type="BoxMesh" id="fin_box"]
+size = Vector3(0.12, 0.02, 0.2)
 
-[sub_resource type="BoxMesh" id="tail"]
-size = Vector3(0.12, 0.12, 0.5)
+[sub_resource type="SphereMesh" id="eye_mesh"]
+radius = 0.06
+height = 0.12
 
 [sub_resource type="StandardMaterial3D" id="eye_mat"]
 shading_mode = 0
@@ -30,34 +42,58 @@ emission_enabled = true
 emission = Color(0.6, 0.95, 1, 1)
 emission_energy_multiplier = 3.5
 
-[sub_resource type="SphereShape3D" id="shape"]
+[sub_resource type="SphereShape3D" id="coll_shape"]
 radius = 0.55
 
 [node name="TwoEye" type="CharacterBody3D"]
 script = ExtResource("1")
-glow_material = SubResource("gm")
+glow_material = SubResource("glow_mat")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
-shape = SubResource("shape")
+shape = SubResource("coll_shape")
 
 [node name="Body" type="Node3D" parent="."]
 
-[node name="Hull" type="MeshInstance3D" parent="Body"]
-transform = Transform3D(0.9, 0, 0, 0, 0.5, 0, 0, 0, 1.3, 0, 0, 0)
-mesh = SubResource("hull")
-surface_material_override/0 = SubResource("gm")
+[node name="Skeleton3D" type="Skeleton3D" parent="Body"]
+bones/0/name = "root"
+bones/0/parent = -1
+bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
+bones/0/enabled = true
+bones/1/name = "mid"
+bones/1/parent = 0
+bones/1/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+bones/1/enabled = true
+bones/2/name = "tail"
+bones/2/parent = 1
+bones/2/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+bones/2/enabled = true
 
-[node name="EyeL" type="MeshInstance3D" parent="Body"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.06, -0.55)
-mesh = SubResource("eye")
+[node name="BodyMesh" type="MeshInstance3D" parent="Body"]
+skeleton = NodePath("../Skeleton3D")
+surface_material_override/0 = SubResource("glow_mat")
+
+[node name="LeftFin" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.28, 0, -0.2)
+mesh = SubResource("fin_box")
+surface_material_override/0 = SubResource("fin_mat")
+
+[node name="RightFin" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.28, 0, -0.2)
+mesh = SubResource("fin_box")
+surface_material_override/0 = SubResource("fin_mat")
+
+[node name="EyeL" type="Node3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.04, -0.45)
+script = ExtResource("3")
+
+[node name="EyeMesh" type="MeshInstance3D" parent="Body/EyeL"]
+mesh = SubResource("eye_mesh")
 surface_material_override/0 = SubResource("eye_mat")
 
-[node name="EyeR" type="MeshInstance3D" parent="Body"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.06, -0.55)
-mesh = SubResource("eye")
-surface_material_override/0 = SubResource("eye_mat")
+[node name="EyeR" type="Node3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.04, -0.45)
+script = ExtResource("3")
 
-[node name="Tail" type="MeshInstance3D" parent="Body"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
-mesh = SubResource("tail")
-surface_material_override/0 = SubResource("gm")
+[node name="EyeMesh" type="MeshInstance3D" parent="Body/EyeR"]
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye_mat")
