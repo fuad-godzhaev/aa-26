@@ -276,6 +276,49 @@ use_collision = true
 material = SubResource("sand_mat")
 material_override = SubResource("sand_mat")
 
+[node name="MoundA" type="CSGSphere3D" parent="Seafloor" unique_id=1702010001]
+transform = Transform3D(2.4, 0, 0, 0, 0.6, 0, 0, 0, 2.4, 6, 0.5, 10)
+radius = 1.0
+
+[node name="MoundB" type="CSGSphere3D" parent="Seafloor" unique_id=1702010002]
+transform = Transform3D(3.2, 0, 0, 0, 0.8, 0, 0, 0, 3.0, -22, 0.5, 0)
+radius = 1.0
+
+[node name="MoundC" type="CSGSphere3D" parent="Seafloor" unique_id=1702010003]
+transform = Transform3D(2.8, 0, 0, 0, 0.7, 0, 0, 0, 2.6, 22, 0.5, -5)
+radius = 1.0
+
+[node name="MoundD" type="CSGBox3D" parent="Seafloor" unique_id=1702010004]
+transform = Transform3D(0.98007727, 0, -0.19866818, 0, 1, 0, 0.19866818, 0, 0.98007727, -3, 0.4, -22)
+size = Vector3(5, 1.4, 3.5)
+
+[node name="MoundE" type="CSGSphere3D" parent="Seafloor" unique_id=1702010005]
+transform = Transform3D(2.2, 0, 0, 0, 0.55, 0, 0, 0, 2.2, 12, 0.5, 20)
+radius = 1.0
+
+[node name="MoundF" type="CSGSphere3D" parent="Seafloor" unique_id=1702010006]
+transform = Transform3D(2.6, 0, 0, 0, 0.7, 0, 0, 0, 2.4, -10, 0.5, 0)
+radius = 1.0
+
+[node name="MoundG" type="CSGBox3D" parent="Seafloor" unique_id=1702010007]
+transform = Transform3D(0.86602539, 0, 0.5, 0, 1, 0, -0.5, 0, 0.86602539, 20, 0.4, -20)
+size = Vector3(4, 1.2, 3)
+
+[node name="DepressionA" type="CSGSphere3D" parent="Seafloor" unique_id=1702010011]
+operation = 2
+transform = Transform3D(2.4, 0, 0, 0, 1.2, 0, 0, 0, 2.4, 8, 0.7, -2)
+radius = 1.0
+
+[node name="DepressionB" type="CSGSphere3D" parent="Seafloor" unique_id=1702010012]
+operation = 2
+transform = Transform3D(2.0, 0, 0, 0, 1.0, 0, 0, 0, 2.0, -2, 0.7, 8)
+radius = 1.0
+
+[node name="DepressionC" type="CSGSphere3D" parent="Seafloor" unique_id=1702010013]
+operation = 2
+transform = Transform3D(2.6, 0, 0, 0, 1.3, 0, 0, 0, 2.6, -16, 0.7, -8)
+radius = 1.0
+
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")
 
