@@ -24,6 +24,12 @@ uniform bool veins_enabled = true;
 uniform float skin_detail = 0.20;
 uniform float skin_freq = 14.0;
 uniform float skin_roughness_mod = 0.18;
+uniform float proc_vein_freq = 5.5;
+uniform float proc_vein_lo = 1.10;
+uniform float proc_vein_hi = 1.55;
+uniform float proc_vein_intensity = 1.4;
+uniform float base_metallic = 0.25;
+uniform float base_roughness = 0.35;
 
 // 3D value noise helpers for procedural skin variation. Branchless, no textures.
 vec3 hash3(vec3 p) {
@@ -50,6 +56,22 @@ float vnoise(vec3 p) {
 	float nx01 = mix(n001, n101, u.x);
 	float nx11 = mix(n011, n111, u.x);
 	return mix(mix(nx00, nx10, u.y), mix(nx01, nx11, u.y), u.z);
+}
+
+// Ridged FBM for organic branching vein patterns on the body surface.
+// Three octaves of inverted-abs noise produce sharp ridges along noise-zero contours,
+// which read as capillary-like glowing channels under the bioluminescent emission.
+float vein_pattern(vec3 p) {
+	float v = 0.0;
+	float amp = 1.0;
+	float freq = proc_vein_freq;
+	for (int i = 0; i < 3; i++) {
+		float n = vnoise(p * freq);
+		v += amp * (1.0 - abs(n));
+		freq *= 2.1;
+		amp *= 0.55;
+	}
+	return v;
 }
 
 // RGB->HSV helper (Sam Hocevar branchless).
@@ -82,8 +104,8 @@ void fragment() {
 
 	// Blend body toward warm belly tint where the surface faces downward.
 	ALBEDO = mix(base_color.rgb, belly_color.rgb, bf * 0.5);
-	METALLIC = 0.15;
-	ROUGHNESS = 0.55;
+	METALLIC = base_metallic;
+	ROUGHNESS = base_roughness;
 
 	// Procedural skin variation: value noise on model-local position breaks up the
 	// plastic look without geometry or texture cost. Subtle dark patches + roughness modulation.
@@ -91,9 +113,12 @@ void fragment() {
 	ALBEDO *= 1.0 - skin_detail * skin_n;
 	ROUGHNESS = clamp(ROUGHNESS + (skin_n - 0.5) * skin_roughness_mod, 0.1, 0.95);
 
-	// Vein mask from per-vertex color luminance; gated by uniform flag.
+	// Vein mask: combine per-vertex paint (deliberate hot-spots like eye-ring, dorsal spine)
+	// with procedural ridged noise (organic branching capillaries across the whole body).
 	float lum = COLOR.r * 0.6 + COLOR.g * 0.3 + COLOR.b * 0.1;
-	float v = smoothstep(vein_threshold, vein_threshold + vein_softness, lum);
+	float v_paint = smoothstep(vein_threshold, vein_threshold + vein_softness, lum);
+	float v_proc = smoothstep(proc_vein_lo, proc_vein_hi, vein_pattern(v_local_pos)) * proc_vein_intensity;
+	float v = clamp(max(v_paint, v_proc), 0.0, 1.5);
 	if (!veins_enabled) {
 		v = 0.0;
 	}

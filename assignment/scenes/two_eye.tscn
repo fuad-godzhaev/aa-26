@@ -6,20 +6,29 @@
 
 [sub_resource type="ShaderMaterial" id="glow_mat"]
 shader = ExtResource("4")
-shader_parameter/base_color = Color(0.45, 0.20, 0.16, 1)
-shader_parameter/glow_color = Color(0.15, 0.85, 0.9, 1)
+shader_parameter/base_color = Color(0.55, 0.25, 0.18, 1)
+shader_parameter/glow_color = Color(0.12, 0.88, 0.95, 1)
 shader_parameter/belly_color = Color(0.95, 0.75, 0.5, 1)
 shader_parameter/pulse_speed = 1.4
 shader_parameter/pulse_strength = 0.45
-shader_parameter/rim_strength = 2.0
-shader_parameter/rim_curve = 3.0
-shader_parameter/emission_energy = 2.4
+shader_parameter/rim_strength = 2.4
+shader_parameter/rim_curve = 3.2
 shader_parameter/emission_pulse = 1.0
-shader_parameter/vein_intensity = 4.0
-shader_parameter/vein_threshold = 0.15
-shader_parameter/vein_softness = 0.25
-shader_parameter/saturation = 1.2
+shader_parameter/vein_intensity = 1.4
+shader_parameter/vein_threshold = 0.30
+shader_parameter/vein_softness = 0.18
+shader_parameter/saturation = 1.25
 shader_parameter/veins_enabled = true
+shader_parameter/skin_detail = 0.18
+shader_parameter/skin_freq = 14.0
+shader_parameter/skin_roughness_mod = 0.22
+shader_parameter/proc_vein_freq = 10.0
+shader_parameter/proc_vein_lo = 1.65
+shader_parameter/proc_vein_hi = 1.82
+shader_parameter/proc_vein_intensity = 0.60
+shader_parameter/base_metallic = 0.25
+shader_parameter/base_roughness = 0.40
+shader_parameter/emission_energy = 2.0
 
 [sub_resource type="SphereShape3D" id="coll_shape"]
 radius = 0.55
