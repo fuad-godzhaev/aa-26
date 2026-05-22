@@ -30,6 +30,10 @@ uniform float proc_vein_hi = 1.55;
 uniform float proc_vein_intensity = 1.4;
 uniform float base_metallic = 0.25;
 uniform float base_roughness = 0.35;
+uniform float iris_threshold = 0.03;
+uniform vec4 iris_color : source_color = vec4(0.02, 0.03, 0.05, 1.0);
+uniform vec4 iris_emission : source_color = vec4(0.10, 0.85, 0.95, 1.0);
+uniform float iris_emission_strength = 0.6;
 
 // 3D value noise helpers for procedural skin variation. Branchless, no textures.
 vec3 hash3(vec3 p) {
@@ -139,4 +143,27 @@ void fragment() {
 	vec3 vein_em = glow_sat * vein_intensity * v * p * emission_pulse * emission_energy;
 	vec3 rim_em = glow_sat * f * 0.3 * emission_pulse;
 	EMISSION = vein_em + rim_em;
+
+	// Iris pass: mark iris-zone fragments by mesh-local position proximity to the two iris
+	// centres in the body-local frame. Robust to vertex-colour gamma encoding which
+	// darkens painted values unpredictably across the glTF round-trip.
+	vec3 iris_r_centre = vec3(0.42, 0.10, 0.45);
+	vec3 iris_l_centre = vec3(-0.42, 0.10, 0.45);
+	float dr = distance(v_local_pos, iris_r_centre);
+	float dl = distance(v_local_pos, iris_l_centre);
+	float d_eye = min(dr, dl);
+	// Larger iris radius: out to 0.085m gives a prominent eye disc.
+	float iris_mask = 1.0 - smoothstep(0.065, 0.085, d_eye);
+	// Inner pupil: a darker dot inside the iris disc.
+	float pupil_mask = 1.0 - smoothstep(0.025, 0.040, d_eye);
+	if (iris_mask > 0.01) {
+		// Mix the iris color over the body, then mix the pupil (pure black) over the iris.
+		vec3 iris_albedo = mix(iris_color.rgb, vec3(0.0, 0.0, 0.0), pupil_mask);
+		vec3 iris_em = iris_emission.rgb * iris_emission_strength * (0.7 + 0.5 * f);
+		iris_em = mix(iris_em, vec3(0.0, 0.0, 0.0), pupil_mask * 0.8);
+		ALBEDO = mix(ALBEDO, iris_albedo, iris_mask);
+		EMISSION = mix(EMISSION, iris_em, iris_mask);
+		ROUGHNESS = mix(ROUGHNESS, 0.15, iris_mask);
+		METALLIC = mix(METALLIC, 0.05, iris_mask);
+	}
 }
