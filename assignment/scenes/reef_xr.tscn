@@ -11,6 +11,7 @@
 [ext_resource type="AudioStream" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/water_surface.tscn" id="11_water"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
+[ext_resource type="Shader" path="res://assignment/materials/sand.gdshader" id="13_sand"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
@@ -59,6 +60,17 @@ adjustment_color_correction = SubResource("grade_ramp")
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_color = Color(0.16, 0.18, 0.15, 1)
 roughness = 0.94
+
+[sub_resource type="ShaderMaterial" id="sand_mat"]
+shader = ExtResource("13_sand")
+shader_parameter/sand_color = Color(0.78, 0.68, 0.52, 1)
+shader_parameter/dark_variation = 0.15
+shader_parameter/ripple_amount = 0.04
+shader_parameter/ripple_freq = 6.0
+shader_parameter/wind_speed = 0.015
+shader_parameter/caustic_intensity = 0.25
+shader_parameter/caustic_color = Color(0.95, 0.97, 0.85, 1)
+shader_parameter/albedo_scale = 0.35
 
 [sub_resource type="StandardMaterial3D" id="rock_mat"]
 albedo_color = Color(0.18, 0.22, 0.22, 1)
@@ -261,7 +273,8 @@ radius = 30.0
 height = 1.0
 sides = 64
 use_collision = true
-material = SubResource("floor_mat")
+material = SubResource("sand_mat")
+material_override = SubResource("sand_mat")
 
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")

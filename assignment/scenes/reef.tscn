@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://bq700b7lx8hy" path="res://assignment/scripts/diver/player_probe.gd" id="2"]
 [ext_resource type="Script" uid="uid://fq8ja6kavdim" path="res://assignment/scripts/gemini/gemini_controller.gd" id="3"]
 [ext_resource type="Shader" uid="uid://c5p7e4yts5d5w" path="res://assignment/materials/glow.gdshader" id="4"]
+[ext_resource type="Shader" path="res://assignment/materials/sand.gdshader" id="13_sand"]
 [ext_resource type="Script" uid="uid://bsr68e2j7yjga" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
 [ext_resource type="PackedScene" uid="uid://cwt5cknn58nus" path="res://assignment/scenes/treasure.tscn" id="6_v4q1w"]
 [ext_resource type="Script" uid="uid://cb0buom0uvbol" path="res://assignment/scripts/world/fish_school.gd" id="7"]
@@ -14,6 +15,13 @@
 [ext_resource type="AudioStream" uid="uid://dbirp78q7u4sw" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/water_surface.tscn" id="11_water"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
+
+[sub_resource type="Gradient" id="grade_gradient"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.05, 0.1, 0.12, 1, 0.5, 0.5, 0.5, 1, 1, 0.95, 0.85, 1)
+
+[sub_resource type="GradientTexture1D" id="grade_ramp"]
+gradient = SubResource("grade_gradient")
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
@@ -29,14 +37,6 @@ sun_curve = 0.1
 [sub_resource type="Sky" id="sky"]
 sky_material = SubResource("sky_mat")
 
-[sub_resource type="Gradient" id="grade_gradient"]
-offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(0.05, 0.1, 0.12, 1, 0.5, 0.5, 0.5, 1, 1, 0.95, 0.85, 1)
-
-[sub_resource type="GradientTexture1D" id="grade_ramp"]
-gradient = SubResource("grade_gradient")
-width = 256
-
 [sub_resource type="Environment" id="Env"]
 background_mode = 2
 sky = SubResource("sky")
@@ -45,11 +45,9 @@ ambient_light_color = Color(0.62, 0.58, 0.42, 1)
 ambient_light_energy = 1.15
 tonemap_mode = 2
 ssao_enabled = true
-ssao_intensity = 2.0
 glow_enabled = true
 glow_intensity = 1.0
 glow_bloom = 0.25
-glow_hdr_threshold = 1.0
 fog_enabled = true
 fog_light_color = Color(0.62, 0.55, 0.4, 1)
 fog_sun_scatter = 0.3
@@ -64,7 +62,6 @@ volumetric_fog_anisotropy = 0.55
 volumetric_fog_length = 80.0
 volumetric_fog_ambient_inject = 0.4
 adjustment_enabled = true
-adjustment_brightness = 1.0
 adjustment_contrast = 1.08
 adjustment_saturation = 1.15
 adjustment_color_correction = SubResource("grade_ramp")
@@ -72,6 +69,17 @@ adjustment_color_correction = SubResource("grade_ramp")
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_color = Color(0.16, 0.18, 0.15, 1)
 roughness = 0.94
+
+[sub_resource type="ShaderMaterial" id="sand_mat"]
+shader = ExtResource("13_sand")
+shader_parameter/sand_color = Color(0.78, 0.68, 0.52, 1)
+shader_parameter/dark_variation = 0.15
+shader_parameter/ripple_amount = 0.04
+shader_parameter/ripple_freq = 6.0
+shader_parameter/wind_speed = 0.015
+shader_parameter/caustic_intensity = 0.25
+shader_parameter/caustic_color = Color(0.95, 0.97, 0.85, 1)
+shader_parameter/albedo_scale = 0.35
 
 [sub_resource type="ShaderMaterial" id="water_mat"]
 render_priority = 0
@@ -196,7 +204,8 @@ use_collision = true
 radius = 30.0
 height = 1.0
 sides = 64
-material = SubResource("floor_mat")
+material = SubResource("sand_mat")
+material_override = SubResource("sand_mat")
 
 [node name="KelpForest" type="Node3D" parent="." unique_id=1808412935]
 script = ExtResource("6")
@@ -233,11 +242,11 @@ fish_color = Color(0.85, 0.65, 0.78, 1)
 fish_emission = Color(0.7, 0.4, 0.6, 1)
 random_seed = 5510
 
-[node name="WaterSurface" parent="." instance=ExtResource("11_water")]
+[node name="WaterSurface" parent="." unique_id=1940220768 instance=ExtResource("11_water")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
 surface_material_override/0 = SubResource("water_mat")
 
-[node name="CloudOverlay" parent="." instance=ExtResource("12_clouds")]
+[node name="CloudOverlay" parent="." unique_id=1100166286 instance=ExtResource("12_clouds")]
 
 [node name="SurfaceTransition" type="Node3D" parent="." unique_id=1701070002]
 script = ExtResource("9")
@@ -738,6 +747,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2, -4)
 script = ExtResource("3")
 player = NodePath("../PlayerRig/Probe")
 home = NodePath("../Home")
+draw_gizmos = false
 
 [node name="Collision" type="CollisionShape3D" parent="Gemini" unique_id=771129657]
 shape = SubResource("gem_shape")
