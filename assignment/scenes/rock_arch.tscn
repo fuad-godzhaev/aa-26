@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://b2rkacrch1arc"]
+
+[sub_resource type="StandardMaterial3D" id="rock_mat"]
+albedo_color = Color(0.34, 0.32, 0.3, 1)
+roughness = 0.95
+metallic = 0.0
+
+[node name="RockArch" type="CSGCombiner3D"]
+use_collision = true
+
+[node name="OuterMass" type="CSGSphere3D" parent="."]
+transform = Transform3D(1.6, 0, 0, 0, 1, 0, 0, 0, 1.2, 0, 0, 0)
+use_collision = true
+radius = 4.2
+radial_segments = 24
+rings = 12
+material = SubResource("rock_mat")
+
+[node name="Lobe1" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 1.6, 0.5)
+radius = 1.8
+material = SubResource("rock_mat")
+
+[node name="Lobe2" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 1.5, -0.4)
+radius = 1.7
+material = SubResource("rock_mat")
+
+[node name="Lobe3" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.2)
+radius = 2.1
+material = SubResource("rock_mat")
+
+[node name="Lobe4" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.4, 1.6)
+radius = 1.4
+material = SubResource("rock_mat")
+
+[node name="Tunnel" type="CSGCylinder3D" parent="."]
+operation = 2
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 1.55
+height = 14.0
+sides = 24

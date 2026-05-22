@@ -15,6 +15,7 @@
 [ext_resource type="AudioStream" uid="uid://dbirp78q7u4sw" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/water_surface.tscn" id="11_water"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/rock_arch.tscn" id="14_arch"]
 
 [sub_resource type="Gradient" id="grade_gradient"]
 offsets = PackedFloat32Array(0, 0.5, 1)
@@ -424,6 +425,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -14)
 
 [node name="Kelp9" parent="." unique_id=1782231589 instance=ExtResource("8_v4q1w")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -15)
+
+[node name="RockArchA" parent="." unique_id=1702030001 instance=ExtResource("14_arch")]
+transform = Transform3D(0.86602539, 0, 0.5, 0, 1, 0, -0.5, 0, 0.86602539, 12, 1.6, -2)
+
+[node name="RockArchB" parent="." unique_id=1702030002 instance=ExtResource("14_arch")]
+transform = Transform3D(0.6427876, 0, -0.7660444, 0, 1, 0, 0.7660444, 0, 0.6427876, -7, 1.5, 11)
 
 [node name="StarfishA" type="Node3D" parent="." unique_id=1701050001]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 4, -0.42, 1)

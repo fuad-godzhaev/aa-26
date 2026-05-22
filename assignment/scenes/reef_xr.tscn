@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://assignment/scenes/water_surface.tscn" id="11_water"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
 [ext_resource type="Shader" path="res://assignment/materials/sand.gdshader" id="13_sand"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/rock_arch.tscn" id="14_arch"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
@@ -675,6 +676,12 @@ surface_material_override/0 = SubResource("kelp_mat")
 [node name="Collision" type="CollisionShape3D" parent="KelpF" unique_id=1701040062]
 transform = Transform3D(1, 0, 0, 0, 1.1, 0, 0, 0, 1, 0, 0, 0)
 shape = SubResource("kelp_shape")
+
+[node name="RockArchA" parent="." unique_id=1702030001 instance=ExtResource("14_arch")]
+transform = Transform3D(0.86602539, 0, 0.5, 0, 1, 0, -0.5, 0, 0.86602539, 12, 1.6, -2)
+
+[node name="RockArchB" parent="." unique_id=1702030002 instance=ExtResource("14_arch")]
+transform = Transform3D(0.6427876, 0, -0.7660444, 0, 1, 0, 0.7660444, 0, 0.6427876, -7, 1.5, 11)
 
 [node name="StarfishA" type="Node3D" parent="." unique_id=1701050001]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 4, -0.42, 1)
