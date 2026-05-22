@@ -15,7 +15,7 @@ const SWIM_TAIL_AMP := 0.20944
 const SWIM_MID_AMP := 0.10472
 const SWIM_MID_PHASE := 1.5708
 
-var role: int = Role.STRIKER
+var role: int = Role.STRIKER: set = _set_role
 var cmd_mode: String = "dock"          # dock | lure | strike | free
 var cmd_target: Vector3 = Vector3.ZERO
 var cmd_aux: Vector3 = Vector3.ZERO    # strike: target velocity to lead
@@ -41,6 +41,24 @@ func _ready() -> void:
 	if _skel != null:
 		_tail_bone = _skel.find_bone("tail")
 		_mid_bone = _skel.find_bone("mid")
+	_apply_role_orientation()
+
+
+# Pollux swims inverted in the fused state so the pair locks belly-to-belly.
+func _apply_role_orientation() -> void:
+	if _disp_body == null:
+		return
+	if role == Role.DISTRACTOR:
+		_disp_body.rotation.x = PI
+	else:
+		_disp_body.rotation.x = 0.0
+
+
+func _set_role(value: int) -> void:
+	role = value
+	# Role may be assigned before or after _ready; re-apply on every change.
+	if is_inside_tree():
+		_apply_role_orientation()
 
 
 # Mating-dance Z-roll + skeletal swim yaw cycle.

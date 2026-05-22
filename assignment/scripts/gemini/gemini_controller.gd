@@ -23,6 +23,9 @@ enum Hunt { NONE, ENCIRCLE, LURE, STRIKE, CHASE, REFUSE }
 
 @export var max_speed: float = 5.0
 @export var formation_gap: float = 0.45
+# Belly-to-belly dock offset in fused state: small vertical-only stack so the
+# two halves overlap and read as one organism (Castor above, Pollux below).
+@export var dock_gap: float = 0.1
 @export var detect_prey_radius: float = 13.0
 @export var hunger_to_hunt: float = 0.4
 @export var lose_distance: float = 28.0
@@ -240,10 +243,10 @@ func _fused_step(delta: float) -> void:
 
 	_integrate_centre(f, delta)
 
-	var head := _heading()
-	var up := Vector3.UP * formation_gap
-	_command(_castor, "dock", _c_pos + up + head * 0.1, Vector3.ZERO)
-	_command(_pollux, "dock", _c_pos - up - head * 0.1, Vector3.ZERO)
+	# Fused: dock vertically-stacked belly-to-belly so the pair reads as one organism.
+	var up := Vector3.UP * dock_gap
+	_command(_castor, "dock", _c_pos + up, Vector3.ZERO)
+	_command(_pollux, "dock", _c_pos - up, Vector3.ZERO)
 	var w: float = bb.wariness
 	_castor.set_glow(Color(0.2, 0.09, 0.03), Color(0.98, 0.6, 0.2), lerpf(1.3, 5.0, w), lerpf(0.5, 0.18, w))
 	_pollux.set_glow(Color(0.03, 0.16, 0.2), Color(0.15, 0.85, 0.95), lerpf(1.3, 5.0, w), lerpf(0.5, 0.18, w))
@@ -252,16 +255,17 @@ func _fused_step(delta: float) -> void:
 # --- Split hunt: Pollux lures + signals, Castor stalks + strikes --------
 func _hunt_step(delta: float) -> void:
 	if _hunt == Hunt.REFUSE:
-		_command(_castor, "dock", _c_pos + Vector3.UP * formation_gap, Vector3.ZERO)
-		_command(_pollux, "dock", _c_pos - Vector3.UP * formation_gap, Vector3.ZERO)
+		# Re-fuse to the same tight belly-to-belly stack used in fused state.
+		_command(_castor, "dock", _c_pos + Vector3.UP * dock_gap, Vector3.ZERO)
+		_command(_pollux, "dock", _c_pos - Vector3.UP * dock_gap, Vector3.ZERO)
 		# Satisfied re-fuse flash, decaying.
 		if _flash_t > 0.0:
 			_flash_t = maxf(_flash_t - delta, 0.0)
 			var fp := 1.0 + _flash_t * 6.0
 			_castor.set_glow(Color(0.2, 0.09, 0.03), Color(1.0, 0.7, 0.3), 1.4, fp)
 			_pollux.set_glow(Color(0.03, 0.16, 0.2), Color(0.3, 1.0, 1.0), 1.4, fp)
-		var cd := _castor.global_position.distance_to(_c_pos + Vector3.UP * formation_gap)
-		var pd := _pollux.global_position.distance_to(_c_pos - Vector3.UP * formation_gap)
+		var cd := _castor.global_position.distance_to(_c_pos + Vector3.UP * dock_gap)
+		var pd := _pollux.global_position.distance_to(_c_pos - Vector3.UP * dock_gap)
 		if cd < fuse_dist and pd < fuse_dist:
 			# Re-attach and keep gliding: carry the pair's momentum into
 			# the fused centre instead of stalling at the dock point.

@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/gemini/two_eye.glb" id="2_body"]
-[ext_resource type="Script" path="res://assignment/scripts/gemini/eye_tracker.gd" id="3"]
 [ext_resource type="Shader" path="res://assignment/materials/glow_veins.gdshader" id="4"]
 
 [sub_resource type="ShaderMaterial" id="glow_mat"]
@@ -22,17 +21,6 @@ shader_parameter/vein_softness = 0.25
 shader_parameter/saturation = 1.2
 shader_parameter/veins_enabled = true
 
-[sub_resource type="SphereMesh" id="eye_mesh"]
-radius = 0.05
-height = 0.1
-
-[sub_resource type="StandardMaterial3D" id="eye_mat"]
-shading_mode = 0
-albedo_color = Color(0.05, 0.05, 0.08, 1)
-emission_enabled = true
-emission = Color(0.1, 0.85, 1, 1)
-emission_energy_multiplier = 2.5
-
 [sub_resource type="SphereShape3D" id="coll_shape"]
 radius = 0.55
 
@@ -46,19 +34,3 @@ shape = SubResource("coll_shape")
 [node name="Body" type="Node3D" parent="."]
 
 [node name="Imported" parent="Body" instance=ExtResource("2_body")]
-
-[node name="EyeL" type="Node3D" parent="Body"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.06, -0.3)
-script = ExtResource("3")
-
-[node name="EyeMesh" type="MeshInstance3D" parent="Body/EyeL"]
-mesh = SubResource("eye_mesh")
-surface_material_override/0 = SubResource("eye_mat")
-
-[node name="EyeR" type="Node3D" parent="Body"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.06, -0.3)
-script = ExtResource("3")
-
-[node name="EyeMesh" type="MeshInstance3D" parent="Body/EyeR"]
-mesh = SubResource("eye_mesh")
-surface_material_override/0 = SubResource("eye_mat")
