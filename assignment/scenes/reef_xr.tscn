@@ -13,6 +13,11 @@
 [ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
 [ext_resource type="Shader" path="res://assignment/materials/sand.gdshader" id="13_sand"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/rock_arch.tscn" id="14_arch"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/anchor.tscn" id="15_anchor"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/plank.tscn" id="16_plank"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/barrel.tscn" id="17_barrel"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/crate.tscn" id="18_crate"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/mast.tscn" id="19_mast"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
@@ -682,6 +687,27 @@ transform = Transform3D(0.86602539, 0, 0.5, 0, 1, 0, -0.5, 0, 0.86602539, 12, 1.
 
 [node name="RockArchB" parent="." unique_id=1702030002 instance=ExtResource("14_arch")]
 transform = Transform3D(0.6427876, 0, -0.7660444, 0, 1, 0, 0.7660444, 0, 0.6427876, -7, 1.5, 11)
+
+[node name="WreckAnchor" parent="." unique_id=1702040001 instance=ExtResource("15_anchor")]
+transform = Transform3D(0.25881904, 0.96592581, 0, -0.96592581, 0.25881904, 0, 0, 0, 1, -6.4, 0.3, -7.2)
+
+[node name="WreckPlankA" parent="." unique_id=1702040002 instance=ExtResource("16_plank")]
+transform = Transform3D(0.74314481, 0, -0.66913062, 0, 1, 0, 0.66913062, 0, 0.74314481, 3.5, 0.04, 6.2)
+
+[node name="WreckPlankB" parent="." unique_id=1702040003 instance=ExtResource("16_plank")]
+transform = Transform3D(0.42261827, 0, 0.90630776, 0, 1, 0, -0.90630776, 0, 0.42261827, -11, 0.04, -8.5)
+
+[node name="WreckBarrel" parent="." unique_id=1702040004 instance=ExtResource("17_barrel")]
+transform = Transform3D(0.98480773, 0.17364818, 0, -0.17364818, 0.98480773, 0, 0, 0, 1, 11, -0.1, 1)
+
+[node name="WreckCrateA" parent="." unique_id=1702040005 instance=ExtResource("18_crate")]
+transform = Transform3D(0.99026806, 0, 0.13917311, 0, 1, 0, -0.13917311, 0, 0.99026806, 14, 0.35, 12)
+
+[node name="WreckCrateB" parent="." unique_id=1702040006 instance=ExtResource("18_crate")]
+transform = Transform3D(0.93969262, 0, -0.34202012, 0, 1, 0, 0.34202012, 0, 0.93969262, 14.1, 1.05, 11.95)
+
+[node name="WreckMast" parent="." unique_id=1702040007 instance=ExtResource("19_mast")]
+transform = Transform3D(0.86602539, 0.5, 0, -0.5, 0.86602539, 0, 0, 0, 1, -15, -0.3, -2)
 
 [node name="StarfishA" type="Node3D" parent="." unique_id=1701050001]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 4, -0.42, 1)
