@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye.gd" id="1"]
-[ext_resource type="Script" path="res://assignment/scripts/gemini/two_eye_mesh.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/gemini/two_eye.glb" id="2_body"]
 [ext_resource type="Script" path="res://assignment/scripts/gemini/eye_tracker.gd" id="3"]
 [ext_resource type="Shader" path="res://assignment/materials/glow_v2.gdshader" id="4"]
 [ext_resource type="Shader" path="res://assignment/materials/fin_sway.gdshader" id="5"]
@@ -54,23 +54,7 @@ shape = SubResource("coll_shape")
 
 [node name="Body" type="Node3D" parent="."]
 
-[node name="Skeleton3D" type="Skeleton3D" parent="Body"]
-bones/0/name = "root"
-bones/0/parent = -1
-bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
-bones/0/enabled = true
-bones/1/name = "mid"
-bones/1/parent = 0
-bones/1/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
-bones/1/enabled = true
-bones/2/name = "tail"
-bones/2/parent = 1
-bones/2/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
-bones/2/enabled = true
-
-[node name="BodyMesh" type="MeshInstance3D" parent="Body"]
-skeleton = NodePath("../Skeleton3D")
-surface_material_override/0 = SubResource("glow_mat")
+[node name="Imported" parent="Body" instance=ExtResource("2_body")]
 
 [node name="LeftFin" type="MeshInstance3D" parent="Body"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.28, 0, -0.2)

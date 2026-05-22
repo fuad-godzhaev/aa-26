@@ -28,15 +28,15 @@ var _tail_bone: int = -1
 var _mid_bone: int = -1
 
 @onready var _disp_body := get_node_or_null("Body") as Node3D
-@onready var _skel := get_node_or_null("Body/Skeleton3D") as Skeleton3D
-@onready var _body_mesh := get_node_or_null("Body/BodyMesh") as MeshInstance3D
+@onready var _skel := get_node_or_null("Body/Imported/TwoEyeArmature/Skeleton3D") as Skeleton3D
+@onready var _body_mesh := get_node_or_null("Body/Imported/TwoEyeArmature/Skeleton3D/TwoEyeBody") as MeshInstance3D
 
 
 func _ready() -> void:
 	add_to_group("gemini_half")
-	# Bind the procedural foureye ArrayMesh to the skinned MeshInstance3D.
-	if _body_mesh != null:
-		_body_mesh.mesh = TwoEyeMesh.build()
+	# Apply the bioluminescent glow material to the .glb's imported body mesh.
+	if _body_mesh != null and glow_material != null:
+		_body_mesh.set_surface_override_material(0, glow_material)
 	# Cache bone indices for cheap per-frame skeletal swim pose updates.
 	if _skel != null:
 		_tail_bone = _skel.find_bone("tail")
