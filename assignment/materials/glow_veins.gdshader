@@ -21,6 +21,36 @@ uniform float vein_threshold = 0.15;
 uniform float vein_softness = 0.25;
 uniform float saturation = 1.2;
 uniform bool veins_enabled = true;
+uniform float skin_detail = 0.20;
+uniform float skin_freq = 14.0;
+uniform float skin_roughness_mod = 0.18;
+
+// 3D value noise helpers for procedural skin variation. Branchless, no textures.
+vec3 hash3(vec3 p) {
+	p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+			 dot(p, vec3(269.5, 183.3, 246.1)),
+			 dot(p, vec3(113.5, 271.9, 124.6)));
+	return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
+
+float vnoise(vec3 p) {
+	vec3 i = floor(p);
+	vec3 f = fract(p);
+	vec3 u = f * f * (3.0 - 2.0 * f);
+	float n000 = dot(hash3(i + vec3(0,0,0)), f - vec3(0,0,0));
+	float n100 = dot(hash3(i + vec3(1,0,0)), f - vec3(1,0,0));
+	float n010 = dot(hash3(i + vec3(0,1,0)), f - vec3(0,1,0));
+	float n110 = dot(hash3(i + vec3(1,1,0)), f - vec3(1,1,0));
+	float n001 = dot(hash3(i + vec3(0,0,1)), f - vec3(0,0,1));
+	float n101 = dot(hash3(i + vec3(1,0,1)), f - vec3(1,0,1));
+	float n011 = dot(hash3(i + vec3(0,1,1)), f - vec3(0,1,1));
+	float n111 = dot(hash3(i + vec3(1,1,1)), f - vec3(1,1,1));
+	float nx00 = mix(n000, n100, u.x);
+	float nx10 = mix(n010, n110, u.x);
+	float nx01 = mix(n001, n101, u.x);
+	float nx11 = mix(n011, n111, u.x);
+	return mix(mix(nx00, nx10, u.y), mix(nx01, nx11, u.y), u.z);
+}
 
 // RGB->HSV helper (Sam Hocevar branchless).
 vec3 rgb2hsv(vec3 c) {
@@ -39,6 +69,12 @@ vec3 hsv2rgb(vec3 c) {
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+varying vec3 v_local_pos;
+
+void vertex() {
+	v_local_pos = VERTEX;
+}
+
 void fragment() {
 	// World-space normal for belly orientation test; same trick as glow_v2.
 	vec3 world_n = (INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz;
@@ -48,6 +84,12 @@ void fragment() {
 	ALBEDO = mix(base_color.rgb, belly_color.rgb, bf * 0.5);
 	METALLIC = 0.15;
 	ROUGHNESS = 0.55;
+
+	// Procedural skin variation: value noise on model-local position breaks up the
+	// plastic look without geometry or texture cost. Subtle dark patches + roughness modulation.
+	float skin_n = vnoise(v_local_pos * skin_freq) * 0.5 + 0.5;
+	ALBEDO *= 1.0 - skin_detail * skin_n;
+	ROUGHNESS = clamp(ROUGHNESS + (skin_n - 0.5) * skin_roughness_mod, 0.1, 0.95);
 
 	// Vein mask from per-vertex color luminance; gated by uniform flag.
 	float lum = COLOR.r * 0.6 + COLOR.g * 0.3 + COLOR.b * 0.1;
