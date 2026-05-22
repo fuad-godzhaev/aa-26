@@ -21,6 +21,12 @@
 [ext_resource type="PackedScene" path="res://assignment/scenes/barrel.tscn" id="17_barrel"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/crate.tscn" id="18_crate"]
 [ext_resource type="PackedScene" path="res://assignment/scenes/mast.tscn" id="19_mast"]
+[ext_resource type="PackedScene" uid="uid://bnwwcb2ss1kjp" path="res://assignment/scenes/fishes/clownfish.glb" id="20_fish1"]
+[ext_resource type="PackedScene" uid="uid://dva8xcgyyv2sl" path="res://assignment/scenes/fishes/blue_tang.glb" id="20_fish2"]
+[ext_resource type="PackedScene" uid="uid://b65utk67dqauq" path="res://assignment/scenes/fishes/yellow_tang.glb" id="20_fish3"]
+[ext_resource type="PackedScene" uid="uid://dr7rowot8cgfv" path="res://assignment/scenes/fishes/angelfish.glb" id="20_fish4"]
+[ext_resource type="PackedScene" uid="uid://dat5d432muf73" path="res://assignment/scenes/fishes/parrotfish.glb" id="20_fish5"]
+[ext_resource type="PackedScene" uid="uid://b1xb816k3y71j" path="res://assignment/scenes/fishes/butterflyfish.glb" id="20_fish6"]
 
 [sub_resource type="Gradient" id="grade_gradient"]
 offsets = PackedFloat32Array(0, 0.5, 1)
@@ -266,12 +272,14 @@ stalk_bottom_radius = 0.16
 [node name="FishSchoolA" type="Node3D" parent="." unique_id=1701060001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, -8)
 script = ExtResource("7")
+species_pool = Array[PackedScene]([ExtResource("20_fish1"), ExtResource("20_fish2"), ExtResource("20_fish3"), ExtResource("20_fish4"), ExtResource("20_fish5"), ExtResource("20_fish6")])
 
 [node name="FishSchoolB" type="Node3D" parent="." unique_id=1701060002]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 7, -6)
 script = ExtResource("7")
 fish_color = Color(0.92, 0.78, 0.55, 1)
 fish_emission = Color(0.85, 0.55, 0.25, 1)
+species_pool = Array[PackedScene]([ExtResource("20_fish1"), ExtResource("20_fish2"), ExtResource("20_fish3"), ExtResource("20_fish4"), ExtResource("20_fish5"), ExtResource("20_fish6")])
 random_seed = 4131
 
 [node name="FishSchoolC" type="Node3D" parent="." unique_id=1701060003]
@@ -281,6 +289,7 @@ count = 14
 spawn_radius = 3.5
 fish_color = Color(0.7, 0.85, 0.95, 1)
 fish_emission = Color(0.35, 0.65, 0.85, 1)
+species_pool = Array[PackedScene]([ExtResource("20_fish1"), ExtResource("20_fish2"), ExtResource("20_fish3"), ExtResource("20_fish4"), ExtResource("20_fish5"), ExtResource("20_fish6")])
 random_seed = 9912
 
 [node name="FishSchoolD" type="Node3D" parent="." unique_id=1701060004]
@@ -289,6 +298,7 @@ script = ExtResource("7")
 count = 10
 fish_color = Color(0.85, 0.65, 0.78, 1)
 fish_emission = Color(0.7, 0.4, 0.6, 1)
+species_pool = Array[PackedScene]([ExtResource("20_fish1"), ExtResource("20_fish2"), ExtResource("20_fish3"), ExtResource("20_fish4"), ExtResource("20_fish5"), ExtResource("20_fish6")])
 random_seed = 5510
 
 [node name="WaterSurface" parent="." unique_id=1940220768 instance=ExtResource("11_water")]
