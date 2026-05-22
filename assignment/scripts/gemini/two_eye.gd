@@ -44,14 +44,16 @@ func _ready() -> void:
 	_apply_role_orientation()
 
 
-# Pollux swims inverted in the fused state so the pair locks belly-to-belly.
+# Pollux swims inverted: roll 180 deg around the body's forward axis so dorsal points
+# down + belly points up + forward direction stays the same. Using rotation.x = PI would
+# also flip the forward axis, leaving Pollux facing backward relative to Castor.
 func _apply_role_orientation() -> void:
 	if _disp_body == null:
 		return
 	if role == Role.DISTRACTOR:
-		_disp_body.rotation.x = PI
+		_disp_body.rotation = Vector3(0, 0, PI)
 	else:
-		_disp_body.rotation.x = 0.0
+		_disp_body.rotation = Vector3.ZERO
 
 
 func _set_role(value: int) -> void:
