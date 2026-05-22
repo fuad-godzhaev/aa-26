@@ -24,21 +24,29 @@ extends Node3D
 @export var collision_mask: int = 1
 @export var fish_color: Color = Color(0.82, 0.92, 0.96, 1)
 @export var fish_emission: Color = Color(0.45, 0.65, 0.75, 1)
+# Species pool of authored low-poly fish .glb scenes. When non-empty, _spawn_fish picks a random species per-fish and instantiates the glb instead of the legacy CapsuleMesh fallback. Each instance gets the shared fish_ambient shader so vertex-painted colours light up.
+@export var species_pool: Array[PackedScene] = []
 @export var random_seed: int = 8675
+
+# Loaded once at _ready and reused for every fish so the material binding stays cheap.
+const FISH_AMBIENT_SHADER := preload("res://assignment/materials/fish_ambient.gdshader")
 
 var _center: Vector3
 var _fish: Array = []
 var _rng := RandomNumberGenerator.new()
+var _fallback_mesh: Mesh
+var _fallback_material: StandardMaterial3D
 
 
 func _ready() -> void:
 	_rng.seed = random_seed
 	# Each school is anchored to its node's global position at startup; containment pulls strays back toward this point, not the world origin.
 	_center = global_position
-	var mat := _make_material()
-	var mesh := _make_mesh()
+	# Pre-build the capsule fallback so empty pools still get visible fish for legacy scenes.
+	_fallback_material = _make_material()
+	_fallback_mesh = _make_mesh()
 	for i in count:
-		_spawn_fish(mat, mesh)
+		_spawn_fish()
 
 
 func _physics_process(delta: float) -> void:
@@ -135,7 +143,7 @@ func _physics_process(delta: float) -> void:
 			body.look_at(body.global_position + vel, Vector3.UP)
 
 
-func _spawn_fish(mat: StandardMaterial3D, mesh: Mesh) -> void:
+func _spawn_fish() -> void:
 	var a: float = _rng.randf() * TAU
 	var r: float = _rng.randf() * spawn_radius
 	var y_off: float = _rng.randf_range(min_y_offset, max_y_offset)
@@ -151,11 +159,11 @@ func _spawn_fish(mat: StandardMaterial3D, mesh: Mesh) -> void:
 	body.collision_layer = collision_layer
 	body.collision_mask = collision_mask
 	body.sync_to_physics = false
-	var mi := MeshInstance3D.new()
-	mi.mesh = mesh
-	mi.material_override = mat
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	body.add_child(mi)
+	# Pick a species; if the pool is empty fall back to the legacy capsule so old scenes keep working.
+	if species_pool.is_empty():
+		_attach_fallback_mesh(body)
+	else:
+		_attach_species_mesh(body)
 	var col := CollisionShape3D.new()
 	var shape := SphereShape3D.new()
 	shape.radius = collider_radius
@@ -163,6 +171,44 @@ func _spawn_fish(mat: StandardMaterial3D, mesh: Mesh) -> void:
 	body.add_child(col)
 	add_child(body)
 	_fish.append({"pos": pos, "vel": vel, "body": body})
+
+
+func _attach_fallback_mesh(body: AnimatableBody3D) -> void:
+	var mi := MeshInstance3D.new()
+	mi.mesh = _fallback_mesh
+	mi.material_override = _fallback_material
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	body.add_child(mi)
+
+
+func _attach_species_mesh(body: AnimatableBody3D) -> void:
+	# Pick a random species scene and instantiate as a child of the body.
+	var idx: int = _rng.randi() % species_pool.size()
+	var packed: PackedScene = species_pool[idx]
+	if packed == null:
+		_attach_fallback_mesh(body)
+		return
+	var instance: Node = packed.instantiate()
+	body.add_child(instance)
+	# Build a per-fish ShaderMaterial so each individual gets its own bend phase. Material instance is intentionally not shared, but the underlying shader (and thus its compiled program) is.
+	var mat := ShaderMaterial.new()
+	mat.shader = FISH_AMBIENT_SHADER
+	mat.set_shader_parameter("bend_phase_offset", _rng.randf() * TAU)
+	# Walk the instantiated tree and bind the material to every MeshInstance3D surface. glb imports come in as a Node3D with one or more child MeshInstance3Ds, so we recurse rather than assume a fixed layout.
+	_apply_material_recursive(instance, mat)
+
+
+func _apply_material_recursive(node: Node, mat: ShaderMaterial) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		var surf_count := mi.get_surface_override_material_count()
+		if surf_count > 0:
+			mi.set_surface_override_material(0, mat)
+		else:
+			mi.material_override = mat
+	for c in node.get_children():
+		_apply_material_recursive(c, mat)
 
 
 func _make_mesh() -> Mesh:
