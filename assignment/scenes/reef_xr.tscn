@@ -7,15 +7,16 @@
 [ext_resource type="Shader" uid="uid://debpi4yxl6my7" path="res://assignment/materials/kelp.gdshader" id="5"]
 [ext_resource type="Script" path="res://assignment/scripts/world/kelp_forest.gd" id="6"]
 [ext_resource type="Script" path="res://assignment/scripts/world/fish_school.gd" id="7"]
-[ext_resource type="Shader" path="res://assignment/materials/water_surface.gdshader" id="8"]
 [ext_resource type="Script" path="res://assignment/scripts/world/surface_transition.gd" id="9"]
 [ext_resource type="AudioStream" path="res://assignment/audio/PLACEHOLDER_ambient.wav" id="10"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/water_surface.tscn" id="11_water"]
+[ext_resource type="PackedScene" path="res://assignment/scenes/cloud_overlay.tscn" id="12_clouds"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.18, 0.42, 0.78, 1)
-sky_horizon_color = Color(0.95, 0.72, 0.45, 1)
+sky_horizon_color = Color(0.98, 0.75, 0.42, 1)
 sky_curve = 0.10
-sky_energy_multiplier = 1.20
+sky_energy_multiplier = 1.35
 ground_bottom_color = Color(0.10, 0.20, 0.22, 1)
 ground_horizon_color = Color(0.85, 0.65, 0.40, 1)
 ground_curve = 0.08
@@ -187,23 +188,6 @@ height = 1.7
 [sub_resource type="BoxShape3D" id="chest_shape"]
 size = Vector3(1.4, 0.84, 0.85)
 
-[sub_resource type="PlaneMesh" id="water_mesh"]
-size = Vector2(220, 220)
-subdivide_width = 60
-subdivide_depth = 60
-
-[sub_resource type="ShaderMaterial" id="water_mat"]
-render_priority = 0
-shader = ExtResource("8")
-shader_parameter/deep_color = Color(0.10, 0.32, 0.42, 0.95)
-shader_parameter/crest_color = Color(0.55, 0.82, 0.92, 0.85)
-shader_parameter/underside_color = Color(0.18, 0.42, 0.50, 0.97)
-shader_parameter/wave_speed = 0.6
-shader_parameter/wave_freq = 0.18
-shader_parameter/wave_amp = 0.22
-shader_parameter/metallic = 0.05
-shader_parameter/roughness = 0.45
-
 [sub_resource type="FastNoiseLite" id="caustic_noise"]
 noise_type = 2
 frequency = 0.06
@@ -311,10 +295,10 @@ count = 10
 fish_color = Color(0.85, 0.65, 0.78, 1)
 fish_emission = Color(0.70, 0.40, 0.60, 1)
 
-[node name="WaterSurface" type="MeshInstance3D" parent="." unique_id=1701070001]
+[node name="WaterSurface" parent="." instance=ExtResource("11_water")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
-mesh = SubResource("water_mesh")
-surface_material_override/0 = SubResource("water_mat")
+
+[node name="CloudOverlay" parent="." instance=ExtResource("12_clouds")]
 
 [node name="SurfaceTransition" type="Node3D" parent="." unique_id=1701070002]
 script = ExtResource("9")
