@@ -3,7 +3,7 @@ extends CanvasLayer
 
 # Full-screen diver-mask vignette. Tuning props are set by PlayerFly. See ARCHITECTURE.md §5d.
 
-const GOGGLES_SHADER := preload("res://assignment/materials/goggles.gdshader")
+const GOGGLES_SHADER := preload("res://assignment/assets/shaders/goggles.gdshader")
 
 @export var mask_color: Color = Color(0.012, 0.018, 0.022, 1.0)
 @export var lens_offset: float = 0.32

@@ -17,11 +17,32 @@ extends CharacterBody3D
 
 # Hard containment so manual integration cannot leave the reef volume.
 # (Per-obstacle avoidance around rocks/corals is a steering behavior in M2.)
-@export var min_altitude: float = 0.7
-@export var max_altitude: float = 18.0
+# Defaults are surface-0/seabed world values; at runtime the Ocean autoload
+# overrides the altitude band + radius. bounds_center is the horizontal centre
+# of the containment cylinder (the reef is placed well off origin, so a fixed
+# origin clamp would yank every agent to (0,0)) and is set by the spawner.
+@export var min_altitude: float = -29.0
+@export var max_altitude: float = -1.0
 @export var bounds_radius: float = 26.0
+@export var bounds_center: Vector3 = Vector3.ZERO
+# If > 0, the agent is ALSO kept OUTSIDE this radius of bounds_center (an inner
+# wall). Used for the shark so it patrols the annulus outside the kelp ring and
+# cannot cross into the forest.
+@export var exclude_radius: float = 0.0
 
 var speed: float = 0.0
+var _bounds_resolved: bool = false
+
+
+# Pull the vertical band from the Ocean autoload once (kept lazy because
+# subclasses override _ready without chaining to a base _ready). The horizontal
+# radius + centre are left to the spawner (they vary: inside vs outside the ring).
+func _resolve_bounds() -> void:
+	_bounds_resolved = true
+	var ocean = get_node_or_null("/root/Ocean")
+	if ocean:
+		min_altitude = ocean.SEABED_Y + 1.0
+		max_altitude = ocean.SURFACE_Y - 1.0
 
 
 # Godot's forward is -Z; this is the agent's facing direction.
@@ -35,6 +56,8 @@ func _compute_steering(_delta: float) -> Vector3:
 
 
 func _physics_process(delta: float) -> void:
+	if not _bounds_resolved:
+		_resolve_bounds()
 	var force := _compute_steering(delta).limit_length(max_force)
 	var accel := force / mass
 	velocity += accel * delta
@@ -71,12 +94,20 @@ func _contain() -> void:
 		if velocity.y > 0.0:
 			velocity.y *= -0.15
 
-	var flat := Vector3(global_position.x, 0.0, global_position.z)
+	var flat := Vector3(global_position.x - bounds_center.x, 0.0, global_position.z - bounds_center.z)
 	var r := flat.length()
 	if r > bounds_radius:
 		var n := flat / r
-		global_position.x = n.x * bounds_radius
-		global_position.z = n.z * bounds_radius
+		global_position.x = bounds_center.x + n.x * bounds_radius
+		global_position.z = bounds_center.z + n.z * bounds_radius
 		var outward := velocity.dot(n)
 		if outward > 0.0:
 			velocity -= n * outward
+	elif exclude_radius > 0.0 and r < exclude_radius:
+		# Inner wall: shove back out and shed the inward velocity component.
+		var n := (flat / r) if r > 0.001 else Vector3.RIGHT
+		global_position.x = bounds_center.x + n.x * exclude_radius
+		global_position.z = bounds_center.z + n.z * exclude_radius
+		var inward := velocity.dot(-n)
+		if inward > 0.0:
+			velocity += n * inward

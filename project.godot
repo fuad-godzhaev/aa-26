@@ -11,13 +11,25 @@ config_version=5
 [application]
 
 config/name="aa26"
-run/main_scene="res://assignment/scenes/boot.tscn"
+run/main_scene="res://assignment/scenes/reef.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://aa_course_material/icon.svg"
+
+[autoload]
+
+MCPScreenshot="*res://addons/godot_mcp/mcp_screenshot_service.gd"
+MCPInputService="*res://addons/godot_mcp/mcp_input_service.gd"
+MCPGameInspector="*res://addons/godot_mcp/mcp_game_inspector_service.gd"
+Ocean="*res://assignment/scripts/ocean.gd"
+Settings="*res://assignment/scripts/settings.gd"
 
 [debug_draw_3d]
 
 settings/addon_root_folder="res://addons/debug_draw_3d"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
 [physics]
 
@@ -26,5 +38,35 @@ settings/addon_root_folder="res://addons/debug_draw_3d"
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="forward_plus"
-renderer/rendering_method.mobile="mobile"
+reflections/sky_reflections/roughness_layers=7
+
+[shader_globals]
+
+ocean_surface_y={
+"type": "float",
+"value": 0.0
+}
+ocean_seabed_y={
+"type": "float",
+"value": -30.0
+}
+ocean_tint_start={
+"type": "float",
+"value": 0.0
+}
+ocean_tint_end={
+"type": "float",
+"value": -30.0
+}
+ocean_water_tint={
+"type": "color",
+"value": Color(0.102, 0.451, 0.62, 1)
+}
+ocean_deep_tint={
+"type": "color",
+"value": Color(0.447, 0.667, 0.722, 1)
+}
+ocean_caustic_tint={
+"type": "color",
+"value": Color(0.702, 0.949, 1, 1)
+}

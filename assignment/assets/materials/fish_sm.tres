@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c1mw41223fxi5"]
+
+[ext_resource type="Shader" uid="uid://ce6ryk6d1vdnq" path="res://assignment/assets/shaders/stylized_fish.gdshader" id="1_assxc"]
+[ext_resource type="Texture2D" uid="uid://mb4xiw0obf6a" path="res://assignment/models/itch/fish/PolyPackFish.png" id="2_tex"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_assxc")
+shader_parameter/albedo_tex = ExtResource("2_tex")
+shader_parameter/use_vertex_color = true
+shader_parameter/tint = Color(1, 1, 1, 1)
+shader_parameter/roughness_val = 0.4
+shader_parameter/rim_strength = 0.3
+shader_parameter/swim_amount = 0.0
+shader_parameter/swim_speed = 3.0
+shader_parameter/body_length = 1.0

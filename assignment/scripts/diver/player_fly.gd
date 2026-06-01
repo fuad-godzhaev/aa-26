@@ -28,13 +28,16 @@ enum SwimPose { IDLE, FORWARD, BACK, LEFT, RIGHT }
 @export var stroke_speed_side: float = 0.55
 @export var underwater_cutoff_hz: float = 1800.0
 @export var fog_density_shallow: float = 0.025
-@export var fog_density_deep: float = 0.07
+@export var fog_density_deep: float = 0.06
+# Vertical span (m) from surface down to the deepest seabed, used to scale depth fog.
+@export var fog_depth_span: float = 30.0
 # Below this Y the depth gradient kicks in; above it the diver is in air.
-@export var surface_y: float = 18.0
+@export var surface_y: float = 0.0
 @export var fog_density_above_water: float = 0.004
 # Hard clamp on swim altitude. Allow the diver's head to poke through (head_poke meters above surface) but no flying further.
 @export var head_poke: float = 0.5
-@export var min_swim_y: float = 0.6
+# Backstop just below the deepest seabed (-30); terrain collision is the real floor.
+@export var min_swim_y: float = -31.0
 
 @export_group("Goggles")
 @export var goggles_visible: bool = true
@@ -64,6 +67,7 @@ var _lean_roll: float = 0.0
 var _breath: Node
 var _goggles: Node
 var _env: WorldEnvironment
+var _settings
 
 @onready var _cam := get_node_or_null("Camera3D") as Camera3D
 @onready var _cam_base_pos: Vector3 = _cam.position if _cam else Vector3.ZERO
@@ -71,9 +75,17 @@ var _env: WorldEnvironment
 
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	# Mouse capture + ESC are owned by the pause menu now.
 	_install_underwater_bus()
 	_env = _find_env(get_tree().current_scene)
+	var ocean = get_node_or_null("/root/Ocean")
+	if ocean:
+		surface_y = ocean.SURFACE_Y
+		min_swim_y = ocean.SEABED_Y - 1.0
+		fog_depth_span = ocean.SURFACE_Y - ocean.SEABED_Y
+	_settings = get_node_or_null("/root/Settings")
+	if _settings:
+		_settings.changed.connect(_apply_settings)
 	if _cam:
 		_breath = DIVER_BREATHING.new()
 		_cam.add_child(_breath)
@@ -85,6 +97,16 @@ func _ready() -> void:
 	_goggles.set("mask_color", goggles_mask_color)
 	_goggles.visible = goggles_visible
 	add_child(_goggles)
+	_apply_settings()
+
+
+# Pull FOV + look sensitivity from the Settings autoload (no-op if absent).
+func _apply_settings() -> void:
+	if _settings == null:
+		return
+	look_sensitivity = _settings.look_sensitivity
+	if _cam:
+		_cam.fov = _settings.fov
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -92,11 +114,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		_yaw -= event.relative.x * look_sensitivity
 		_pitch = clampf(_pitch - event.relative.y * look_sensitivity, -1.4, 1.4)
 		rotation = Vector3(_pitch, _yaw, 0.0)
-	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _physics_process(delta: float) -> void:
@@ -128,10 +145,10 @@ func _physics_process(delta: float) -> void:
 		if velocity.y < 0.0:
 			velocity.y = 0.0
 
-	var load: float = clampf(velocity.length() / maxf(move_speed, 0.001), 0.0, 1.0)
+	var effort: float = clampf(velocity.length() / maxf(move_speed, 0.001), 0.0, 1.0)
 	if is_sprinting:
-		load = clampf(load * 1.25, 0.0, 1.0)
-	exertion = lerpf(exertion, load, clampf(delta * 1.8, 0.0, 1.0))
+		effort = clampf(effort * 1.25, 0.0, 1.0)
+	exertion = lerpf(exertion, effort, clampf(delta * 1.8, 0.0, 1.0))
 
 	swim_pose = _classify_pose(input_axes)
 	stroke_phase = fposmod(stroke_phase + _stroke_hz() * delta, 1.0)
@@ -226,7 +243,8 @@ func _apply_depth_fog() -> void:
 	if global_position.y > surface_y:
 		_env.environment.fog_density = fog_density_above_water
 		return
-	var depth: float = clampf((4.0 - global_position.y) / 14.0, 0.0, 1.0)
+	# 0 at the surface, 1 at the deepest seabed.
+	var depth: float = clampf((surface_y - global_position.y) / fog_depth_span, 0.0, 1.0)
 	_env.environment.fog_density = lerpf(fog_density_shallow, fog_density_deep, depth)
 
 
