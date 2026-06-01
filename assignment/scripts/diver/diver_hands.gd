@@ -57,7 +57,7 @@ func _hand_transform(pose: int, phase: float, ex: float, is_left: bool) -> Trans
 
 
 # Phase 0..0.5 = stroke (out-sweep + in-sweep); 0.5..1.0 = recovery (hands together, shoot forward).
-func _breaststroke(phase: float, sx: float, lateral_mult: float, ex: float) -> Transform3D:
+func _breaststroke(phase: float, sx: float, lateral_mult: float, _ex: float) -> Transform3D:
 	var lat_max: float = stroke_lateral_max * lateral_mult
 	var x_norm: float
 	var z_norm: float

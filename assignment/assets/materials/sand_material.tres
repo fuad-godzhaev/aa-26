@@ -1,0 +1,21 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dal2m4kdl46bj"]
+
+[ext_resource type="Texture2D" uid="uid://bt514amw31xy5" path="res://assignment/assets/GroundSand005/GroundSand005_COL_2K.jpg" id="1_8f6x0"]
+[ext_resource type="Texture2D" uid="uid://ncbtphr8iy1t" path="res://assignment/assets/GroundSand005/GroundSand005_AO_2K.jpg" id="2_2nvom"]
+[ext_resource type="Texture2D" uid="uid://cmd0mk1qe01d8" path="res://assignment/assets/GroundSand005/GroundSand005_DISP_2K.jpg" id="3_1glpy"]
+[ext_resource type="Texture2D" uid="uid://dupr8x8idqbwl" path="res://assignment/assets/GroundSand005/GroundSand005_REFL_2K.jpg" id="4_db6gd"]
+[ext_resource type="Texture2D" uid="uid://dmh43f2diic23" path="res://assignment/assets/GroundSand005/GroundSand005_NRM_2K.jpg" id="5_brvkc"]
+[ext_resource type="Texture2D" uid="uid://cplgei5jsssa" path="res://assignment/assets/GroundSand005/GroundSand005_GLOSS_2K.jpg" id="6_me15c"]
+
+[resource]
+albedo_texture = ExtResource("1_8f6x0")
+metallic = 1.0
+metallic_texture = ExtResource("4_db6gd")
+roughness_texture = ExtResource("6_me15c")
+normal_enabled = true
+normal_texture = ExtResource("5_brvkc")
+ao_enabled = true
+ao_light_affect = 1.0
+ao_texture = ExtResource("2_2nvom")
+heightmap_enabled = true
+heightmap_texture = ExtResource("3_1glpy")

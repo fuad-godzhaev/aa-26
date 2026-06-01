@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1767684413058,
+      "tag": "0000_spooky_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1767696901133,
+      "tag": "0001_tough_pestilence",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1767701453800,
+      "tag": "0002_thick_meggan",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1767904629501,
+      "tag": "0003_melted_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1767904684105,
+      "tag": "0004_clumsy_beyonder",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1770616112829,
+      "tag": "0005_rename_create_script_tool",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1770618916274,
+      "tag": "0006_great_spacker_dave",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1770999482940,
+      "tag": "0007_lumpy_turbo",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1771828312458,
+      "tag": "0008_rename_view_script_to_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1772295399108,
+      "tag": "0009_vengeful_black_bird",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1775455364161,
+      "tag": "0010_outstanding_the_hood",
+      "breakpoints": true
+    }
+  ]
+}

@@ -29,7 +29,7 @@ extends Node3D
 @export var random_seed: int = 8675
 
 # Loaded once at _ready and reused for every fish so the material binding stays cheap.
-const FISH_AMBIENT_SHADER := preload("res://assignment/materials/fish_ambient.gdshader")
+const FISH_AMBIENT_SHADER := preload("res://assignment/assets/shaders/fish_ambient.gdshader")
 
 var _center: Vector3
 var _fish: Array = []

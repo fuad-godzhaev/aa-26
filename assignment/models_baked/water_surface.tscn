@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://d4yl6vmge632"]
+
+[ext_resource type="Shader" uid="uid://bq514saeqouwc" path="res://assignment/assets/shaders/water_surface.gdshader" id="1_water_shader"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+size = Vector2(220, 220)
+subdivide_width = 60
+subdivide_depth = 60
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
+render_priority = 0
+shader = ExtResource("1_water_shader")
+shader_parameter/deep_color = Color(0.1, 0.32, 0.42, 0.95)
+shader_parameter/crest_color = Color(0.55, 0.82, 0.92, 0.85)
+shader_parameter/underside_color = Color(0.18, 0.42, 0.5, 0.97)
+shader_parameter/wave_speed = 0.6
+shader_parameter/metallic = 0.05
+shader_parameter/roughness = 0.45
+shader_parameter/albedo_mix = 0.0
+shader_parameter/normal_scale = 0.3
+shader_parameter/normal_strength = 0.5
+shader_parameter/normal_speed = 0.05
+shader_parameter/ao_strength = 0.0
+shader_parameter/height_amount = 0.0
+shader_parameter/tex_scale = 0.3
+shader_parameter/enable_refraction = false
+shader_parameter/refract_strength = 0.04
+shader_parameter/foam_threshold = 0.5
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+
+[node name="WaterSurface" type="MeshInstance3D" unique_id=1114397871]
+mesh = SubResource("PlaneMesh_water")
+surface_material_override/0 = SubResource("ShaderMaterial_water")

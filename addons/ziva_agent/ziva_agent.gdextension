@@ -1,0 +1,9 @@
+[configuration]
+entry_symbol = "libziva_agent_gdextension_init"
+compatibility_minimum = "4.2"
+
+[libraries]
+windows.debug.x86_64 = "bin/windows_x86_64/libziva_agent.windows.release.x86_64.dll"
+windows.release.x86_64 = "bin/windows_x86_64/libziva_agent.windows.release.x86_64.dll"
+macos.debug = "bin/macos/libziva_agent.macos.release.framework"
+macos.release = "bin/macos/libziva_agent.macos.release.framework"

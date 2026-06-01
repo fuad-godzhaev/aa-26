@@ -1,0 +1,1 @@
+ALTER TABLE `chats` ADD `is_deleted` integer DEFAULT false NOT NULL;
