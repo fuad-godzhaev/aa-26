@@ -7,13 +7,26 @@ extends SteeringAgent
 
 enum Role { STRIKER, DISTRACTOR }
 
+# Optional pre-authored glow material. If left null a UNIQUE one is built per
+# instance at _ready, so Castor amber and Pollux cyan never share + fight.
 @export var glow_material: ShaderMaterial
+# Rotate the visual so its nose runs down the agent forward (-Z). The castor /
+# pollux meshes are modelled along +X, so 90 deg; the old single mesh = 0.
+@export var model_yaw_deg: float = 0.0
+# The old two_eye used ONE mesh for both halves and flipped the lower one
+# belly-up. castor/pollux are separate, already-correct models, so leave off.
+@export var invert_when_distractor: bool = false
 
-# Swim cycle constants: 0.6 s loop, tail yaw ±12 deg, mid yaw ±6 deg, mid offset ~90 deg.
+const GLOW_SHADER := preload("res://assignment/assets/shaders/glow.gdshader")
+
+# Skeletal swim constants (used only if the model actually has a skeleton).
 const SWIM_RATE := 10.472
 const SWIM_TAIL_AMP := 0.20944
 const SWIM_MID_AMP := 0.10472
 const SWIM_MID_PHASE := 1.5708
+# Gentle whole-body yaw wag for static (boneless) halves so they still feel alive.
+const WAG_RATE := 6.0
+const WAG_AMP := 0.06
 
 var role: int = Role.STRIKER: set = _set_role
 var cmd_mode: String = "dock"          # dock | lure | strike | free
@@ -26,18 +39,35 @@ var _disp_t: float = 0.0
 var _swim_t: float = 0.0
 var _tail_bone: int = -1
 var _mid_bone: int = -1
+var _base_yaw: float = 0.0
 
-@onready var _disp_body := get_node_or_null("Body") as Node3D
-@onready var _skel := get_node_or_null("Body/Imported/TwoEyeArmature/Skeleton3D") as Skeleton3D
-@onready var _body_mesh := get_node_or_null("Body/Imported/TwoEyeArmature/Skeleton3D/TwoEyeBody") as MeshInstance3D
+var _disp_body: Node3D
+var _skel: Skeleton3D
+var _glow_parts: Array[MeshInstance3D] = []
 
 
 func _ready() -> void:
 	add_to_group("gemini_half")
-	# Apply the bioluminescent glow material to the .glb's imported body mesh.
-	if _body_mesh != null and glow_material != null:
-		_body_mesh.set_surface_override_material(0, glow_material)
-	# Cache bone indices for cheap per-frame skeletal swim pose updates.
+	# Visual wrapper = the model root (first Node3D child), e.g. the glb instance.
+	for c in get_children():
+		if c is Node3D:
+			_disp_body = c as Node3D
+			break
+	_base_yaw = deg_to_rad(model_yaw_deg)
+	# Build a unique glow material unless one was authored in the scene.
+	if glow_material == null:
+		glow_material = ShaderMaterial.new()
+		glow_material.shader = GLOW_SHADER
+	# Apply the role glow to the lume parts (body, fins, eyes, esca); leave the
+	# structural teeth / illicium with their imported material.
+	for m in _find_meshes(self):
+		var nm := m.name.to_lower()
+		if nm.contains("teeth") or nm.contains("illicium"):
+			continue
+		m.material_override = glow_material
+		_glow_parts.append(m)
+	# Skeleton is optional (the castor/pollux halves are static meshes).
+	_skel = _find_skeleton(self)
 	if _skel != null:
 		_tail_bone = _skel.find_bone("tail")
 		_mid_bone = _skel.find_bone("mid")
@@ -50,10 +80,8 @@ func _ready() -> void:
 func _apply_role_orientation() -> void:
 	if _disp_body == null:
 		return
-	if role == Role.DISTRACTOR:
-		_disp_body.rotation = Vector3(0, 0, PI)
-	else:
-		_disp_body.rotation = Vector3.ZERO
+	var roll: float = PI if (invert_when_distractor and role == Role.DISTRACTOR) else 0.0
+	_disp_body.rotation = Vector3(0.0, _base_yaw, roll)
 
 
 func _set_role(value: int) -> void:
@@ -69,7 +97,11 @@ func _process(delta: float) -> void:
 	_swim_t += delta
 	if _disp_body != null:
 		var luring := cmd_mode == "lure"
+		# Lure mating-dance Z-roll.
 		_disp_body.rotation.z = sin(_disp_t) * (0.5 if luring else 0.04)
+		# Static (boneless) halves: wag the whole body in yaw so it still swims.
+		if _skel == null:
+			_disp_body.rotation.y = _base_yaw + sin(_swim_t * WAG_RATE) * WAG_AMP
 	# Skeletal swim: sinusoidal yaw on tail + mid bones, mid offset by ~90 deg.
 	if _skel != null:
 		var phase: float = _swim_t * SWIM_RATE
@@ -108,3 +140,25 @@ func set_glow(base_col: Color, glow_col: Color, pulse_speed: float, pulse_streng
 	glow_material.set_shader_parameter("glow_color", glow_col)
 	glow_material.set_shader_parameter("pulse_speed", pulse_speed)
 	glow_material.set_shader_parameter("pulse_strength", pulse_strength)
+
+
+func _find_meshes(n: Node) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	for c in _walk(n):
+		if c is MeshInstance3D and (c as MeshInstance3D).mesh != null:
+			out.append(c as MeshInstance3D)
+	return out
+
+
+func _find_skeleton(n: Node) -> Skeleton3D:
+	for c in _walk(n):
+		if c is Skeleton3D:
+			return c as Skeleton3D
+	return null
+
+
+func _walk(n: Node) -> Array:
+	var out: Array = [n]
+	for c in n.get_children():
+		out.append_array(_walk(c))
+	return out

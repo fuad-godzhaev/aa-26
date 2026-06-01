@@ -7,8 +7,9 @@ extends Node3D
 # and commands each half every frame. Halves live in the scene root so
 # they steer in world space when split.
 
-const TWO_EYE := preload("res://assignment/scenes/two_eye.tscn")
-const PREY := preload("res://assignment/scenes/prey.tscn")
+const CASTOR := preload("res://assignment/models_baked/castor.tscn")
+const POLLUX := preload("res://assignment/models_baked/pollux.tscn")
+const PREY := preload("res://assignment/models_baked/prey.tscn")
 
 # NONE = fused. ENCIRCLE = Castor arcs out of sight to a hide spot.
 # LURE = Pollux displays/mesmerises while Castor waits hidden.
@@ -45,6 +46,9 @@ enum Hunt { NONE, ENCIRCLE, LURE, STRIKE, CHASE, REFUSE }
 @export var corner_dist: float = 3.5
 @export var encircle_timeout: float = 5.0
 @export var cruise_altitude: float = 4.0
+# When false, the controller does NOT spawn its own den prey (the scene/biome
+# builder distributes prey per biome instead).
+@export var spawn_internal_prey: bool = true
 
 var bb: Blackboard
 var _bt: BehaviorTree.BTNode
@@ -55,6 +59,15 @@ var _audio: CreatureAudio
 var _c_pos: Vector3
 var _c_vel: Vector3 = Vector3.ZERO
 var _wander := SteeringBehaviors.WanderState.new()
+
+# Arena bounds for the logical centre, resolved at _ready from the Ocean autoload
+# and the home anchor (the reef sits well off origin, so a fixed origin clamp is
+# wrong). _min_y/_max_y keep the pair in the water column; the horizontal clamp
+# is a radius around _arena_center.
+var _arena_center: Vector3 = Vector3.ZERO
+var _min_y: float = -29.0
+var _max_y: float = -1.0
+var _arena_radius: float = 27.5
 
 var _hunt: int = Hunt.NONE
 var _target: Node3D
@@ -69,9 +82,20 @@ var _hud: Label
 
 
 func _ready() -> void:
+	add_to_group("gemini")
 	bb = Blackboard.new()
 	_build_tree()
 	_c_pos = global_position
+	# Resolve the arena bounds in world space (surface-0 / seabed world). The reef
+	# is placed far off origin, so clamp horizontally around the den, not (0,0).
+	var ocean = get_node_or_null("/root/Ocean")
+	if ocean:
+		_min_y = ocean.SEABED_Y + 1.0
+		_max_y = ocean.SURFACE_Y - 1.0
+		_arena_radius = ocean.ARENA_RADIUS
+	_arena_center = home.global_position if home else global_position
+	# Cruise at the depth it was authored at (mid-water), not the old surface-18 value.
+	cruise_altitude = clampf(_c_pos.y, _min_y, _max_y)
 	# The scene tree is still instantiating; spawning siblings now is
 	# rejected ("parent busy"). Defer until the tree is settled.
 	_setup.call_deferred()
@@ -85,8 +109,8 @@ func _setup() -> void:
 			old.free()
 
 	var root := get_parent()
-	_castor = TWO_EYE.instantiate()
-	_pollux = TWO_EYE.instantiate()
+	_castor = CASTOR.instantiate()
+	_pollux = POLLUX.instantiate()
 	root.add_child(_castor)
 	root.add_child(_pollux)
 	_castor.role = TwoEye.Role.STRIKER
@@ -95,14 +119,26 @@ func _setup() -> void:
 	_pollux.max_speed = max_speed * 0.95
 	_castor.global_position = _c_pos + Vector3.UP * formation_gap
 	_pollux.global_position = _c_pos - Vector3.UP * formation_gap
+	# Contain the halves INSIDE the kelp ring (the play boundary), not origin.
+	var ring = get_tree().get_first_node_in_group("play_boundary")
+	if ring:
+		_arena_center = Vector3(ring.global_position.x, 0.0, ring.global_position.z)
+		_arena_radius = maxf(ring.ring_radius - 3.0, 4.0)
+	_castor.bounds_center = _arena_center
+	_pollux.bounds_center = _arena_center
+	_castor.bounds_radius = _arena_radius
+	_pollux.bounds_radius = _arena_radius
 	_castor.set_glow(Color(0.2, 0.09, 0.03), Color(0.98, 0.6, 0.2), 1.4, 0.5)
 	_pollux.set_glow(Color(0.03, 0.16, 0.2), Color(0.15, 0.85, 0.95), 1.4, 0.5)
 
-	var spawner := PreySpawner.new()
-	spawner.prey_scene = PREY
-	root.add_child(spawner)
-	if home:
-		spawner.global_position = home.global_position
+	if spawn_internal_prey:
+		var spawner := PreySpawner.new()
+		spawner.prey_scene = PREY
+		# Position BEFORE add_child: the spawner spawns prey in its own _ready, so
+		# it must already be at the den (else prey spawn at origin and swim back).
+		if home:
+			spawner.position = home.global_position
+		root.add_child(spawner)
 
 	# Let Prey perceive the player without per-fish wiring.
 	if player:
@@ -286,7 +322,7 @@ func _hunt_step(delta: float) -> void:
 	# Centre trails the pair so lose_distance is measured from the action.
 	_c_pos = _c_pos.lerp((_castor.global_position + _pollux.global_position) * 0.5, clampf(delta * 2.5, 0.0, 1.0))
 
-	var hide := ppos - front * standoff_dist + Vector3.DOWN * hide_below
+	var hide_pos := ppos - front * standoff_dist + Vector3.DOWN * hide_below
 	var to_cas := _castor.global_position - ppos
 	# Prey "sees" Castor if it is close AND inside the prey's forward cone.
 	var spotted := to_cas.length() < spot_dist and to_cas.normalized().dot(front) > spot_cone
@@ -303,7 +339,7 @@ func _hunt_step(delta: float) -> void:
 			_command(_castor, "dock", ring, Vector3.ZERO)
 			_chase_t += delta
 			var behind := to_cas.normalized().dot(front) < -0.4
-			if (behind and _castor.global_position.distance_to(hide) < encircle_radius * 0.7) or _chase_t > encircle_timeout:
+			if (behind and _castor.global_position.distance_to(hide_pos) < encircle_radius * 0.7) or _chase_t > encircle_timeout:
 				_hunt = Hunt.LURE
 				_chase_t = 0.0
 			if spotted:
@@ -314,7 +350,7 @@ func _hunt_step(delta: float) -> void:
 			# waits hidden behind/below for the hold signal.
 			_command(_pollux, "lure", ppos + front * 1.6, Vector3.ZERO)
 			prey.set("lure_active", true)
-			_command(_castor, "dock", hide, Vector3.ZERO)
+			_command(_castor, "dock", hide_pos, Vector3.ZERO)
 			var held := _pollux.global_position.distance_to(ppos) < hold_dist and pvel.length() < hold_speed
 			_hold_t = (_hold_t + delta) if held else maxf(_hold_t - delta, 0.0)
 			if _hold_t >= hold_time:
@@ -406,12 +442,13 @@ func _integrate_centre(force: Vector3, delta: float) -> void:
 	if _c_vel.length() > max_speed:
 		_c_vel = _c_vel.normalized() * max_speed
 	_c_pos += _c_vel * delta
-	_c_pos.y = clampf(_c_pos.y, 0.8, 18.0)
-	var flat := Vector3(_c_pos.x, 0.0, _c_pos.z)
-	if flat.length() > 26.0:
-		flat = flat.normalized() * 26.0
-		_c_pos.x = flat.x
-		_c_pos.z = flat.z
+	# Keep the centre in the water column and within the arena radius of the den.
+	_c_pos.y = clampf(_c_pos.y, _min_y, _max_y)
+	var flat := Vector3(_c_pos.x - _arena_center.x, 0.0, _c_pos.z - _arena_center.z)
+	if flat.length() > _arena_radius:
+		flat = flat.normalized() * _arena_radius
+		_c_pos.x = _arena_center.x + flat.x
+		_c_pos.z = _arena_center.z + flat.z
 
 
 # TODO(placeholder): coded GPUParticles3D capture burst; promote to an authored particle scene during polish. See ARCHITECTURE.md §9.

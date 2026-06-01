@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" uid="uid://diiwsdxdrtjss" path="res://assignment/models/castor.glb" id="1_glb"]
+[ext_resource type="Script" uid="uid://b25k7lbxsipnm" path="res://assignment/scripts/gemini/two_eye.gd" id="2_scr"]
+
+[node name="Castor" type="CharacterBody3D"]
+script = ExtResource("2_scr")
+model_yaw_deg = 90.0
+
+[node name="Model" parent="." instance=ExtResource("1_glb")]
