@@ -3,10 +3,9 @@ extends Node3D
 
 # Detect the diver crossing the water-surface plane and toggle the at-the-surface effects: Master-bus low-pass on/off + splash GPUParticles3D + placeholder splash SFX. Fog is owned by PlayerFly (it handles the above-vs-under branch by depth). See ARCHITECTURE.md §5e + §9.
 
-# TODO(placeholder): replace PLACEHOLDER_splash.wav with a real splash/foley sample.
-const SPLASH_PATH := "res://assignment/audio/PLACEHOLDER_splash.wav"
+const SPLASH_PATH := "res://assignment/audio/splash.wav"
 
-@export var surface_y: float = 18.0
+@export var surface_y: float = 0.0
 @export var hysteresis: float = 0.4
 @export var splash_count: int = 80
 @export var splash_lifetime: float = 1.2
@@ -30,6 +29,10 @@ func _ready() -> void:
 				break
 	if ResourceLoader.exists(SPLASH_PATH):
 		_splash_stream = load(SPLASH_PATH)
+	# Surface plane is the world surface (Ocean is the single source of truth).
+	var ocean = get_node_or_null("/root/Ocean")
+	if ocean:
+		surface_y = ocean.SURFACE_Y
 	# Player joins the "player" group from GeminiController's _setup, which is deferred — retry until it shows up.
 	call_deferred("_resolve_player")
 

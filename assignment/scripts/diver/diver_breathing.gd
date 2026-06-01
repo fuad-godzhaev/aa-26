@@ -3,9 +3,9 @@ extends Node3D
 
 # Breath cycle generator + regulator SFX + exhale bubbles. See ARCHITECTURE.md §5d.
 
-# TODO(placeholder): both WAVs are silent stubs; swap for real regulator inhale / exhale samples. See ARCHITECTURE.md §9.
-const BREATH_IN_PATH := "res://assignment/audio/PLACEHOLDER_breath_in.wav"
-const BREATH_OUT_PATH := "res://assignment/audio/PLACEHOLDER_breath_out.wav"
+# Regulator inhale / exhale + exhale bubbles (synthesized CC0 foley).
+const BREATH_IN_PATH := "res://assignment/audio/breath_in.wav"
+const BREATH_OUT_PATH := "res://assignment/audio/breath_out.wav"
 
 @export var idle_period: float = 4.8
 @export var sprint_period: float = 1.9
